@@ -1,0 +1,364 @@
+app:
+  description: 一个使用AI自动判分的智能体
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: AI自动判分编程题
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: document-extractor
+      id: 1743306846242-source-1743313866773-target
+      source: '1743306846242'
+      sourceHandle: source
+      target: '1743313866773'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: document-extractor
+      id: 1743306846242-source-1743315487549-target
+      source: '1743306846242'
+      sourceHandle: source
+      target: '1743315487549'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 17433103715520-source-1743315144592-target
+      source: '17433103715520'
+      sourceHandle: source
+      target: '1743315144592'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: end
+      id: 1743315144592-source-1743309739881-target
+      source: '1743315144592'
+      sourceHandle: source
+      target: '1743309739881'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: document-extractor
+      id: 1743306846242-source-17449815551210-target
+      source: '1743306846242'
+      sourceHandle: source
+      target: '17449815551210'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743313866773-source-17433103715520-target
+      source: '1743313866773'
+      sourceHandle: source
+      target: '17433103715520'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743315487549-source-17433103715520-target
+      source: '1743315487549'
+      sourceHandle: source
+      target: '17433103715520'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 17449815551210-source-17433103715520-target
+      source: '17449815551210'
+      sourceHandle: source
+      target: '17433103715520'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: 学生作答
+          max_length: 2048
+          options: []
+          required: true
+          type: file
+          variable: Student_answer
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: 题目
+          max_length: 48
+          options: []
+          required: true
+          type: file
+          variable: Question
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: 评分标准
+          max_length: 48
+          options: []
+          required: true
+          type: file
+          variable: Evaluate_standard
+      height: 142
+      id: '1743306846242'
+      position:
+        x: -1253.6479430330187
+        y: 264.69169590345984
+      positionAbsolute:
+        x: -1253.6479430330187
+        y: 264.69169590345984
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1743315144592'
+          - text
+          variable: output
+        selected: false
+        title: '结束 '
+        type: end
+      height: 90
+      id: '1743309739881'
+      position:
+        x: 527.9978776167708
+        y: 264.69169590345984
+      positionAbsolute:
+        x: 527.9978776167708
+        y: 264.69169590345984
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 9e35c2e4-308a-4f4d-b39c-d2822860cbcd
+          role: system
+          text: "角色：\n    你是一名精准的专家级阅卷老师，正在给学生作答试卷判分\n\n任务：\n    根据评分标准和题目内容，仅完成学生作答试卷中【编程题】部分。要求指出学生作答错误点和得分，并给出更正建议。\n\
+            \n#学生作答内容：\n{{#1743313866773.text#}}\n#题目内容：\n{{#1743315487549.text#}}\n\
+            #评分标准：\n{{#17449815551210.text#}}"
+        selected: false
+        title: 编程题判分
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17433103715520'
+      position:
+        x: -363.1317910590391
+        y: 264.69169590345984
+      positionAbsolute:
+        x: -363.1317910590391
+        y: 264.69169590345984
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 学生作答提取
+        type: document-extractor
+        variable_selector:
+        - '1743306846242'
+        - Student_answer
+      height: 92
+      id: '1743313866773'
+      position:
+        x: -836.9809504143864
+        y: 264.69169590345984
+      positionAbsolute:
+        x: -836.9809504143864
+        y: 264.69169590345984
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 002a2a88-b51d-4775-ab07-efef8e4fbfb2
+          role: system
+          text: "#角色：\n你是一名阅卷格式整理大师，正在整理题目评分结果。\n\n#任务：\n整理所有题目判分结果，输出阅卷报告\n\n#输出格式：\n\
+            编程题“\n    题目题干：\n    学生答案：\n    参考答案：\n    作答情况：正确\n\n分数：（50/100）\n\n\
+            #不同题型判分结果如下：\n    ##编程题判分结果：{{#17433103715520.text#}}"
+        selected: false
+        title: 输出评分报告
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1743315144592'
+      position:
+        x: 82.87394703625682
+        y: 264.69169590345984
+      positionAbsolute:
+        x: 82.87394703625682
+        y: 264.69169590345984
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 题目提取
+        type: document-extractor
+        variable_selector:
+        - '1743306846242'
+        - Question
+      height: 92
+      id: '1743315487549'
+      position:
+        x: -843.2165130931287
+        y: 487.848896500286
+      positionAbsolute:
+        x: -843.2165130931287
+        y: 487.848896500286
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 评分标准提取
+        type: document-extractor
+        variable_selector:
+        - '1743306846242'
+        - Evaluate_standard
+      height: 92
+      id: '17449815551210'
+      position:
+        x: -843.2165130931287
+        y: 673.9972018906242
+      positionAbsolute:
+        x: -843.2165130931287
+        y: 673.9972018906242
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 679.2057923044872
+      y: 196.21020215819988
+      zoom: 0.5096550481822559

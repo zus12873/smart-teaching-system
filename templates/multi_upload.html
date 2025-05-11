@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能教学系统 - 试卷自动评分</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3c6e71;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        .header p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        .form-section {
+            background-color: #f7fbff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3c6e71;
+        }
+        .form-section h4 {
+            color: #3c6e71;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .btn-primary {
+            background-color: #3c6e71;
+            border-color: #3c6e71;
+            padding: 10px 30px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #335c5f;
+            border-color: #335c5f;
+        }
+        .result-container {
+            margin-top: 30px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            display: none;
+        }
+        .file-upload-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+            border: 2px dashed #3c6e71;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .file-upload-wrapper:hover {
+            background-color: #f0f7f7;
+        }
+        .file-upload-message {
+            font-size: 1rem;
+            color: #6c757d;
+            margin: 10px 0;
+        }
+        pre {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        /* 导航栏样式调整 */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: 600;
+        }
+        /* 调整主容器，考虑到导航栏 */
+        .container {
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 10px;
+                padding: 15px;
+            }
+        }
+        .file-status {
+            margin-top: 5px;
+            display: none;
+        }
+        .file-container {
+            margin-bottom: 20px;
+        }
+        .workflow-options {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f7fdff;
+            border-radius: 8px;
+            border: 1px solid #e1f5fe;
+        }
+        .result-content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .result-content h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #3c6e71;
+        }
+        .result-content h2 {
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #f0f0f0;
+            color: #2c3e50;
+        }
+        .result-content strong {
+            color: #3c6e71;
+        }
+        /* 代码块样式 */
+        .result-content pre {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 15px 0;
+            border: 1px solid #e9ecef;
+            overflow-x: auto;
+        }
+        .result-content code {
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+        }
+        .score-highlight {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e74c3c;
+            padding: 5px 10px;
+            background-color: #fef9f9;
+            border-radius: 4px;
+            border-left: 3px solid #e74c3c;
+        }
+        .error-list {
+            background-color: #fff8f8;
+            border-left: 3px solid #e74c3c;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .error-list li {
+            margin-bottom: 6px;
+        }
+    </style>
+    <!-- 添加Marked.js解析库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- 添加highlight.js支持代码高亮 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/c.min.js"></script>
+    <!-- 添加html2pdf.js支持PDF导出 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <!-- 添加导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #3c6e71;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-mortarboard-fill me-2"></i>智能教学系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house-door-fill me-1"></i>首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/multi_upload">
+                            <i class="bi bi-check-circle me-1"></i>试卷评分
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-journal-album me-1"></i>题库管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-file-earmark-text me-1"></i>试卷管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-question-circle me-1"></i>帮助中心
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <span class="navbar-text me-3">
+                        <i class="bi bi-person-circle me-1"></i>教师用户
+                    </span>
+                    <button class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-box-arrow-right me-1"></i>退出
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="bi bi-files me-2"></i> 试卷自动评分系统</h1>
+            <p>上传答案文件和评分标准，系统将自动分析并给出评分结果</p>
+        </div>
+        
+        <form id="multiWorkflowForm" enctype="multipart/form-data">
+            <div class="form-section">
+                <h4><i class="bi bi-upload me-2"></i> 文件上传</h4>
+                <p class="text-muted mb-4">请依次上传三个TXT格式文件，系统将自动进行处理</p>
+                
+                <div class="row">
+                    <div class="col-md-4 file-container">
+                        <div class="file-upload-wrapper">
+                            <div class="mb-2"><i class="bi bi-file-earmark-text fs-2 text-primary"></i></div>
+                            <label for="file1" class="form-label">学生答案</label>
+                            <input type="file" class="form-control file-input" id="file1" name="file1" accept=".txt" required>
+                            <div class="file-upload-message">支持 .txt 格式</div>
+                            <div class="file-status text-success"><i class="bi bi-check-circle"></i> 已选择</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 file-container">
+                        <div class="file-upload-wrapper">
+                            <div class="mb-2"><i class="bi bi-file-earmark-text fs-2 text-primary"></i></div>
+                            <label for="file2" class="form-label">标准题目</label>
+                            <input type="file" class="form-control file-input" id="file2" name="file2" accept=".txt" required>
+                            <div class="file-upload-message">支持 .txt 格式</div>
+                            <div class="file-status text-success"><i class="bi bi-check-circle"></i> 已选择</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 file-container">
+                        <div class="file-upload-wrapper">
+                            <div class="mb-2"><i class="bi bi-file-earmark-text fs-2 text-primary"></i></div>
+                            <label for="file3" class="form-label">评分标准</label>
+                            <input type="file" class="form-control file-input" id="file3" name="file3" accept=".txt" required>
+                            <div class="file-upload-message">支持 .txt 格式</div>
+                            <div class="file-status text-success"><i class="bi bi-check-circle"></i> 已选择</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-4">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <strong>操作说明：</strong> 请上传三个文件 - 学生答案文件、标准题目文件和评分标准文件。系统将自动进行答案评估和评分。
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 col-6 mx-auto mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-lightning-charge"></i> 开始评分
+                </button>
+            </div>
+        </form>
+        
+        <div class="spinner-container" id="loading">
+            <div class="d-flex flex-column align-items-center">
+                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">正在处理...</span>
+                </div>
+                <p class="fs-5">正在处理文件，请稍候...</p>
+                <p class="text-muted small">处理多个文件可能需要较长时间</p>
+            </div>
+        </div>
+        
+        <div class="result-container" id="result-container">
+            <div class="result-header">
+                <h4><i class="bi bi-award"></i> 评分结果</h4>
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary" id="show-raw-json">
+                        <i class="bi bi-code-slash"></i> 显示原始JSON
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" id="copy-result">
+                        <i class="bi bi-clipboard"></i> 复制结果
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary" id="download-result">
+                        <i class="bi bi-file-earmark-pdf"></i> 导出PDF
+                    </button>
+                </div>
+            </div>
+            <div id="result-content" class="result-content"></div>
+            <pre id="result" style="display: none;"></pre>
+        </div>
+    </div>
+    
+    <script>
+        // 文件上传显示文件名和状态
+        document.querySelectorAll('.file-input').forEach(function(input) {
+            input.addEventListener('change', function() {
+                const container = this.closest('.file-container');
+                const messageElem = container.querySelector('.file-upload-message');
+                const statusElem = container.querySelector('.file-status');
+                
+                if (this.files.length > 0) {
+                    const fileName = this.files[0].name;
+                    messageElem.textContent = fileName;
+                    statusElem.style.display = 'block';
+                    
+                    // 检查文件类型
+                    if (!fileName.toLowerCase().endsWith('.txt')) {
+                        statusElem.className = 'file-status text-danger';
+                        statusElem.innerHTML = '<i class="bi bi-exclamation-triangle"></i> 请上传TXT文件';
+                    } else {
+                        statusElem.className = 'file-status text-success';
+                        statusElem.innerHTML = '<i class="bi bi-check-circle"></i> 已选择';
+                    }
+                } else {
+                    messageElem.textContent = '支持 .txt 格式';
+                    statusElem.style.display = 'none';
+                }
+            });
+        });
+        
+        // 表单提交处理
+        document.getElementById('multiWorkflowForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = new FormData(this);
+            var resultContainer = document.getElementById('result-container');
+            var resultContent = document.getElementById('result-content');
+            var resultDiv = document.getElementById('result');
+            var loadingDiv = document.getElementById('loading');
+            
+            // 显示加载提示
+            loadingDiv.style.display = 'flex';
+            loadingDiv.querySelector('p.fs-5').textContent = '正在评分中，请稍候...';
+            loadingDiv.querySelector('p.text-muted.small').textContent = '系统正在分析学生答案和评分标准';
+            resultContainer.style.display = 'none';
+            
+            // 发送请求
+            fetch('/run_multi_workflow', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 隐藏加载提示
+                loadingDiv.style.display = 'none';
+                
+                // 保存原始JSON
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+                
+                // 处理结果内容
+                let processedContent = '';
+                if (data && data.data && data.data.outputs && data.data.outputs.output) {
+                    // 直接从output字段获取内容
+                    processedContent = data.data.outputs.output;
+                    
+                    // 设置marked选项，使其能够识别和正确处理代码块
+                    marked.setOptions({
+                        highlight: function(code, lang) {
+                            if (lang && hljs.getLanguage(lang)) {
+                                return hljs.highlight(code, { language: lang }).value;
+                            }
+                            return hljs.highlightAuto(code).value;
+                        },
+                        breaks: true
+                    });
+                    
+                    resultContent.innerHTML = marked.parse(processedContent);
+                    
+                    // 应用其他格式化
+                    formatResultContent(resultContent);
+                } else {
+                    resultContent.innerHTML = '<div class="alert alert-info">无法获取评分结果或返回格式不符合预期。</div>';
+                    resultContent.innerHTML += '<div class="text-muted small mt-2">您可以点击"显示原始JSON"查看完整返回数据。</div>';
+                }
+                
+                resultContainer.style.display = 'block';
+                
+                // 滚动到结果区域
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(error => {
+                loadingDiv.style.display = 'none';
+                resultDiv.textContent = '发生错误: ' + error;
+                resultDiv.style.display = 'block';
+                resultContent.style.display = 'none';
+                resultContainer.style.display = 'block';
+            });
+        });
+        
+        // 格式化评分结果内容
+        function formatResultContent(resultContent) {
+            // 查找并高亮显示分数信息
+            const scorePattern = /分数.*?(\d+)\/(\d+)/;
+            const allElements = resultContent.querySelectorAll('p');
+            
+            allElements.forEach(element => {
+                if (scorePattern.test(element.textContent)) {
+                    const scoreText = element.textContent;
+                    element.innerHTML = `<span class="score-highlight">${scoreText}</span>`;
+                }
+            });
+            
+            // 优化错误列表样式
+            const errorLists = resultContent.querySelectorAll('ul, ol');
+            errorLists.forEach(list => {
+                const prevElement = list.previousElementSibling;
+                if (prevElement && prevElement.textContent.includes('主要错误')) {
+                    list.classList.add('error-list');
+                }
+            });
+        }
+        
+        // 显示原始JSON按钮
+        document.getElementById('show-raw-json').addEventListener('click', function() {
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('result-content');
+            
+            if (resultDiv.style.display === 'none') {
+                resultDiv.style.display = 'block';
+                resultContent.style.display = 'none';
+                this.innerHTML = '<i class="bi bi-file-text"></i> 显示处理结果';
+            } else {
+                resultDiv.style.display = 'none';
+                resultContent.style.display = 'block';
+                this.innerHTML = '<i class="bi bi-code-slash"></i> 显示原始JSON';
+            }
+        });
+        
+        // 复制结果按钮
+        document.getElementById('copy-result').addEventListener('click', function() {
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('result-content');
+            
+            let textToCopy;
+            if (resultDiv.style.display === 'none') {
+                // 复制处理后的内容
+                textToCopy = resultContent.textContent;
+            } else {
+                // 复制JSON
+                textToCopy = resultDiv.textContent;
+            }
+            
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="bi bi-check-lg"></i> 已复制';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('复制失败:', err);
+                });
+        });
+        
+        // 下载结果按钮
+        document.getElementById('download-result').addEventListener('click', function() {
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('result-content');
+            
+            // 如果显示的是原始JSON，则下载JSON文件
+            if (resultDiv.style.display !== 'none') {
+                const content = resultDiv.textContent;
+                const blob = new Blob([content], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = '评分结果.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                return;
+            }
+            
+            // 否则导出评分报告为PDF
+            const element = resultContent;
+            
+            // 加载提示
+            const loadingText = document.createElement('div');
+            loadingText.className = 'text-center mt-3 mb-3';
+            loadingText.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>正在生成PDF...';
+            element.parentNode.insertBefore(loadingText, element.nextSibling);
+            
+            // 设置PDF选项
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: '评分报告.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // 执行导出
+            html2pdf().set(opt).from(element).save().then(() => {
+                // 导出完成后移除加载提示
+                element.parentNode.removeChild(loadingText);
+            });
+        });
+    </script>
+    <!-- 添加Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

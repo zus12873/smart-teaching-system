@@ -1,0 +1,549 @@
+app:
+  description: 一个使用AI自动判分的智能体
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: AI自动判分
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: document-extractor
+      id: 1743306846242-source-1743313866773-target
+      source: '1743306846242'
+      sourceHandle: source
+      target: '1743313866773'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743313866773-source-1743312749805-target
+      source: '1743313866773'
+      sourceHandle: source
+      target: '1743312749805'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 1743312749805-source-1743309537101-target
+      source: '1743312749805'
+      sourceHandle: source
+      target: '1743309537101'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 1743312749805-source-17433103707120-target
+      source: '1743312749805'
+      sourceHandle: source
+      target: '17433103707120'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 1743312749805-source-17433103715520-target
+      source: '1743312749805'
+      sourceHandle: source
+      target: '17433103715520'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: document-extractor
+      id: 1743306846242-source-1743315487549-target
+      source: '1743306846242'
+      sourceHandle: source
+      target: '1743315487549'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743315487549-source-1743312749805-target
+      source: '1743315487549'
+      sourceHandle: source
+      target: '1743312749805'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 1743309537101-source-1743315144592-target
+      source: '1743309537101'
+      sourceHandle: source
+      target: '1743315144592'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 17433103707120-source-1743315144592-target
+      source: '17433103707120'
+      sourceHandle: source
+      target: '1743315144592'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 17433103715520-source-1743315144592-target
+      source: '17433103715520'
+      sourceHandle: source
+      target: '1743315144592'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: end
+      id: 1743315144592-source-1743309739881-target
+      source: '1743315144592'
+      sourceHandle: source
+      target: '1743309739881'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: llm
+      id: 1743312749805-source-17433167008460-target
+      source: '1743312749805'
+      sourceHandle: source
+      target: '17433167008460'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: llm
+      id: 17433167008460-source-1743315144592-target
+      source: '17433167008460'
+      sourceHandle: source
+      target: '1743315144592'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: 学生答案
+          max_length: 2048
+          options: []
+          required: true
+          type: file
+          variable: Pupil_answer
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: 参考答案
+          max_length: 2048
+          options: []
+          required: true
+          type: file
+          variable: Reference_answer
+      height: 116
+      id: '1743306846242'
+      position:
+        x: -1253.6479430330187
+        y: 264.69169590345984
+      positionAbsolute:
+        x: -1253.6479430330187
+        y: 264.69169590345984
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 9e35c2e4-308a-4f4d-b39c-d2822860cbcd
+          role: system
+          text: "角色：\n    你是一名精准的专家级阅卷老师，正在给学生作答试卷判分\n\n任务：\n    仅完成学生作答试卷的判分中【选择题】部分\n\
+            \n#学生作答内容：\n{{#1743312749805.text#}}\n#参考答案（标准答案）：\n{{#1743315487549.text#}}"
+        selected: true
+        title: 选择题判分
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1743309537101'
+      position:
+        x: 5.683303118607114
+        y: 255.72572555381112
+      positionAbsolute:
+        x: 5.683303118607114
+        y: 255.72572555381112
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1743315144592'
+          - text
+          variable: output
+        selected: false
+        title: '结束 '
+        type: end
+      height: 90
+      id: '1743309739881'
+      position:
+        x: 931.6074911341682
+        y: 255.72572555381112
+      positionAbsolute:
+        x: 931.6074911341682
+        y: 255.72572555381112
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 9e35c2e4-308a-4f4d-b39c-d2822860cbcd
+          role: system
+          text: "角色：\n    你是一名精准的专家级阅卷老师，正在给学生作答试卷判分\n\n任务：\n    仅完成学生作答试卷的判分中【判断题】部分\n\
+            \n#学生作答内容：\n{{#1743312749805.text#}}\n#参考答案（标准答案）：\n{{#1743315487549.text#}}"
+        selected: false
+        title: 判断题判分
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17433103707120'
+      position:
+        x: 5.683303118607114
+        y: 417.0017318725586
+      positionAbsolute:
+        x: 5.683303118607114
+        y: 417.0017318725586
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 9e35c2e4-308a-4f4d-b39c-d2822860cbcd
+          role: system
+          text: "角色：\n    你是一名精准的专家级阅卷老师，正在给学生作答试卷判分\n\n任务：\n    仅完成学生作答试卷的判分中【编程题】部分\n\
+            \n#学生作答内容：\n{{#1743312749805.text#}}\n#参考答案（标准答案）：\n{{#1743315487549.text#}}"
+        selected: false
+        title: 编程题判分
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17433103715520'
+      position:
+        x: -1.7810719683752723
+        y: 596.978250147284
+      positionAbsolute:
+        x: -1.7810719683752723
+        y: 596.978250147284
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 2db242d7-7a5e-435a-af26-b937a3f2ce9e
+          role: system
+          text: "#角色：\n 您是一名助手，负责将学生作答的试卷按不同题型拆分成不同模块。\n\n#学生作答内容如下：\n{{#1743313866773.text#}}\n\
+            ---以上学生作答内容结束---\n\n#请按照以下步骤完成任务：\n        1. 阅读整个试卷内容，识别各个题目的类型（如选择题、填空题、简答题等）。\n\
+            \        2. 根据题型将试卷中的题目进行分类，确保同一类型的题目归为同一模块。\n        3. 对每个模块下的题目，按顺序排列，保持原有的题号和答题顺序。\n\
+            \        4. 确保拆分后的模块内容清晰、结构合理，不包含任何XML标签。\n        5. 最终输出各个题型的模块内容，每个模块独立呈现。\n\
+            \n#期望输出的格式：\n{\n  \"exam_paper\": {\n    \"选择题\": [\n      {\n       \
+            \ \"question_type\": \"选择题\",\n        \"question_number\": 1,\n     \
+            \   \"question_content\": \"计算机中CPU的全称是什么？\\nA.中央处理器 B.图形处理器 C.内存单元 D.电源模块\"\
+            ,\n        \"student_answer\": \"A\"\n      },\n      {\n        \"question_type\"\
+            : \"选择题\",\n        \"question_number\": 5,\n        \"question_content\"\
+            : \"HTTP协议默认端口号是？\\nA.80 B.443 C.21 D.3306\",\n        \"student_answer\"\
+            : \"B\"\n      }\n    ],\n    \"填空题\": [\n      {\n        \"question_type\"\
+            : \"填空题\",\n        \"question_number\": 2,\n        \"question_content\"\
+            : \"植物通过____作用将二氧化碳转化为氧气\",\n        \"student_answer\": \"光合\"\n    \
+            \  },\n      {\n        \"question_type\": \"填空题\",\n        \"question_number\"\
+            : 6,\n        \"question_content\": \"《银河系漫游指南》中生命宇宙万物的答案是____\",\n  \
+            \      \"student_answer\": \"42\"\n      }\n    ],\n    \"判断题\": [\n \
+            \     {\n        \"question_type\": \"判断题\",\n        \"question_number\"\
+            : 3,\n        \"question_content\": \"太阳是太阳系中最大的天体\",\n        \"student_answer\"\
+            : \"错误\"\n      },\n      {\n        \"question_type\": \"判断题\",\n   \
+            \     \"question_number\": 7,\n        \"question_content\": \"Python是弱类型语言\"\
+            ,\n        \"student_answer\": \"正确\"\n      }\n    ],\n    \"编程题\": [\n\
+            \      {\n        \"question_type\": \"编程题\",\n        \"question_number\"\
+            : 4,\n        \"question_content\": \"编写Python代码打印Hello World\",\n   \
+            \     \"student_answer\": \"print('Hello World')\"\n      },\n      {\n\
+            \        \"question_type\": \"编程题\",\n        \"question_number\": 8,\n\
+            \        \"question_content\": \"写出SQL查询students表所有数据的语句\",\n        \"\
+            student_answer\": \"SELECT id,name FROM students\"\n      }\n    ]\n \
+            \ }\n}"
+        selected: false
+        title: 学生答案拆分
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1743312749805'
+      position:
+        x: -470.8261854199298
+        y: 264.69169590345984
+      positionAbsolute:
+        x: -470.8261854199298
+        y: 264.69169590345984
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 学生答案提取
+        type: document-extractor
+        variable_selector:
+        - '1743306846242'
+        - Pupil_answer
+      height: 92
+      id: '1743313866773'
+      position:
+        x: -835.4973264378018
+        y: 264.69169590345984
+      positionAbsolute:
+        x: -835.4973264378018
+        y: 264.69169590345984
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 002a2a88-b51d-4775-ab07-efef8e4fbfb2
+          role: system
+          text: "#角色：\n你是一名阅卷格式整理大师，正在整理每个题目评分结果。\n\n#任务：\n整理所有题目判分结果，输出阅卷报告\n\n#输出格式：\n\
+            选择题：\n    题目题干：HTTP协议默认端口号是？\\nA.80 B.443 C.21 D.3306\n    学生答案：B\n  \
+            \  参考答案：A\n   作答情况：答错\n\n判断题：\n    题目题干：\n    学生答案：\n    参考答案：\n    作答情况：正确\n\
+            \n编程题“\n    题目题干：\n    学生答案：\n    参考答案：\n    作答情况：正确\n\n总分：（50/100）\n\n\
+            \n#不同题型判分结果如下：\n    ##选择题判分结果：{{#1743309537101.text#}}\n    ##判断题判分结果：{{#17433103707120.text#}}\n\
+            \    ##编程题判分结果：{{#17433103715520.text#}}\n    ##填空题判分结果：{{#17433167008460.text#}}"
+        selected: false
+        title: 输出评分报告
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1743315144592'
+      position:
+        x: 444.35944773803124
+        y: 232.94000949894848
+      positionAbsolute:
+        x: 444.35944773803124
+        y: 232.94000949894848
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 参考答案
+        type: document-extractor
+        variable_selector:
+        - '1743306846242'
+        - Reference_answer
+      height: 92
+      id: '1743315487549'
+      position:
+        x: -843.2165130931287
+        y: 489.2879552468427
+      positionAbsolute:
+        x: -843.2165130931287
+        y: 489.2879552468427
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 9e35c2e4-308a-4f4d-b39c-d2822860cbcd
+          role: system
+          text: "角色：\n    你是一名精准的专家级阅卷老师，正在给学生作答试卷判分\n\n任务：\n    仅完成学生作答试卷的判分中【填空题】部分\n\
+            \n#学生作答内容：\n{{#1743312749805.text#}}\n#参考答案（标准答案）：\n{{#1743315487549.text#}}"
+        selected: false
+        title: '填空题判分 '
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17433167008460'
+      position:
+        x: -8.162241169925437
+        y: 736.346303070591
+      positionAbsolute:
+        x: -8.162241169925437
+        y: 736.346303070591
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 773.9017284347902
+      y: 112.97269423197508
+      zoom: 0.6341405385478164

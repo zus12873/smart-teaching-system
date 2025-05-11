@@ -1,0 +1,855 @@
+app:
+  description: 一个自动出试卷的智能体
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: AI出试卷
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743261098345-source-1743261315926-target
+      selected: false
+      source: '1743261098345'
+      sourceHandle: source
+      target: '1743261315926'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743261098345-source-17432618817250-target
+      selected: false
+      source: '1743261098345'
+      sourceHandle: source
+      target: '17432618817250'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 1743261315926-source-1743261924730-target
+      selected: false
+      source: '1743261315926'
+      sourceHandle: source
+      target: '1743261924730'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 17432618817250-source-1743261924730-target
+      selected: false
+      source: '17432618817250'
+      sourceHandle: source
+      target: '1743261924730'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: end
+      id: 1743261924730-source-1743256786502-target
+      selected: false
+      source: '1743261924730'
+      sourceHandle: source
+      target: '1743256786502'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743261098345-source-17432637158480-target
+      selected: false
+      source: '1743261098345'
+      sourceHandle: source
+      target: '17432637158480'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 17432637158480-source-1743261924730-target
+      selected: false
+      source: '17432637158480'
+      sourceHandle: source
+      target: '1743261924730'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 17432637257640-source-1743261924730-target
+      selected: false
+      source: '17432637257640'
+      sourceHandle: source
+      target: '1743261924730'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: if-else
+      id: 1743256781043-source-1743301009569-target
+      selected: false
+      source: '1743256781043'
+      sourceHandle: source
+      target: '1743301009569'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: document-extractor
+      id: 1743301009569-true-1743261098345-target
+      selected: false
+      source: '1743301009569'
+      sourceHandle: 'true'
+      target: '1743261098345'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743261098345-source-17432637257640-target
+      selected: false
+      source: '1743261098345'
+      sourceHandle: source
+      target: '17432637257640'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 1743299713342-source-17433015663120-target
+      selected: false
+      source: '1743299713342'
+      sourceHandle: source
+      target: '17433015663120'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: document-extractor
+      id: 1743301009569-false-1743301907068-target
+      selected: false
+      source: '1743301009569'
+      sourceHandle: 'false'
+      target: '1743301907068'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743301907068-source-17433016653310-target
+      selected: false
+      source: '1743301907068'
+      sourceHandle: source
+      target: '17433016653310'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743301907068-source-17433016085490-target
+      selected: false
+      source: '1743301907068'
+      sourceHandle: source
+      target: '17433016085490'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743301907068-source-17433016300070-target
+      selected: false
+      source: '1743301907068'
+      sourceHandle: source
+      target: '17433016300070'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: 1743301907068-source-1743299713342-target
+      selected: false
+      source: '1743301907068'
+      sourceHandle: source
+      target: '1743299713342'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 17433016300070-source-17433015663120-target
+      selected: false
+      source: '17433016300070'
+      sourceHandle: source
+      target: '17433015663120'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 17433016085490-source-17433015663120-target
+      selected: false
+      source: '17433016085490'
+      sourceHandle: source
+      target: '17433015663120'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 17433016653310-source-17433015663120-target
+      selected: false
+      source: '17433016653310'
+      sourceHandle: source
+      target: '17433015663120'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: end
+      id: 17433015663120-source-1743256786502-target
+      selected: false
+      source: '17433015663120'
+      sourceHandle: source
+      target: '1743256786502'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - label: 选择题数量
+          max_length: 48
+          options: []
+          required: true
+          type: number
+          variable: choice
+        - label: 判断题数量
+          max_length: 48
+          options: []
+          required: true
+          type: number
+          variable: True_False
+        - label: 难度等级（简单/中等/困难）
+          max_length: 48
+          options: []
+          required: true
+          type: text-input
+          variable: Difficulty_Level
+        - label: 科目
+          max_length: 48
+          options: []
+          required: true
+          type: text-input
+          variable: subject
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: 参考文件（10000字以内）
+          max_length: 48
+          options: []
+          required: true
+          type: file
+          variable: file
+        - label: 填空题数量
+          max_length: 48
+          options: []
+          required: true
+          type: number
+          variable: Gap_filling
+        - label: 编程题数量
+          max_length: 48
+          options: []
+          required: true
+          type: number
+          variable: Programming
+        - label: 出题方式
+          max_length: 48
+          options:
+          - 从上传题库中抽取
+          - 参考资料自动生成
+          required: true
+          type: select
+          variable: Pattern_type
+      height: 272
+      id: '1743256781043'
+      position:
+        x: -490.73764707409964
+        y: 177.91056584106042
+      positionAbsolute:
+        x: -490.73764707409964
+        y: 177.91056584106042
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1743261924730'
+          - text
+          variable: output1
+        - value_selector:
+          - '17433015663120'
+          - text
+          variable: output2
+        selected: false
+        title: 结束
+        type: end
+      height: 116
+      id: '1743256786502'
+      position:
+        x: 1700.092448623415
+        y: 562.4427842419825
+      positionAbsolute:
+        x: 1700.092448623415
+        y: 562.4427842419825
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 题库
+        type: document-extractor
+        variable_selector:
+        - '1743256781043'
+        - file
+      height: 92
+      id: '1743261098345'
+      position:
+        x: 253.67739815931088
+        y: 194.54657050927636
+      positionAbsolute:
+        x: 253.67739815931088
+        y: 194.54657050927636
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - edition_type: basic
+          id: 2fd9e8ca-2e98-4222-abf3-c63b93455c63
+          role: system
+          text: "#角色：\n你是一个专家级抽题老师，擅长在文档中按要求抽题。\n\n#任务：\n-从用户上传文档中找到【选择题】，\n-在文档中随机抽取题目，无需按顺序抽题。\n\
+            \n\n#要求：\n  -抽取数量{{#1743256781043.choice#}}\n  -仅输出题目内容，不要输出其他提示信息。\n\
+            \  -抽取题目请按用户选择难度{{#1743256781043.Difficulty_Level#}}抽题\n -抽题请随机抽选，保证随机性\n\
+            \n\n#用户上传的文档是：{{#1743261098345.text#}}\n#用户选择的科目是：{{#1743256781043.subject#}}\n"
+        selected: true
+        title: 选择题-自动抽题
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1743261315926'
+      position:
+        x: 717.4557541176031
+        y: 194.54657050927636
+      positionAbsolute:
+        x: 717.4557541176031
+        y: 194.54657050927636
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 2fd9e8ca-2e98-4222-abf3-c63b93455c63
+          role: system
+          text: "#角色：\n你是一个专家级抽题老师，擅长在文档中按要求抽题。\n\n#任务：\n从用户上传文档中找到【填空题】，并根据难度抽取题目。\n\
+            \n\n#要求：\n  -抽取数量{{#1743256781043.Gap_filling#}}\n  -仅输出题目内容，不要输出其他提示信息\n\
+            \n\n#用户上传的文档是：{{#1743261098345.text#}}\n#用户选择的难度是：{{#1743256781043.Difficulty_Level#}}\n\
+            #用户选择的科目是：{{#1743256781043.subject#}}\n"
+        selected: false
+        title: '填空题-自动抽题 '
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17432618817250'
+      position:
+        x: 717.4557541176031
+        y: 410.9515117872031
+      positionAbsolute:
+        x: 717.4557541176031
+        y: 410.9515117872031
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 4b2c465f-6a4e-4c11-8aa7-118bcf0df8dc
+          role: system
+          text: "#角色：\n  你一个试卷格式整理大师。\n\n#任务：\n  你需要根据题目内容整理成一张格式标准的试卷；\n\n#用户选择的科目是：{{#1743256781043.subject#}}\n\
+            \n#规则：\n  -试卷不要给出答案，题目内容中可能把答案放进去了，你帮我删除答案部分，只保留题目内容；\n  -试卷按选择题>判断题>填空题>编程题的顺序编撰，序号从1开始。\n\
+            \  -请在每个题型中打乱题目顺序；\n  -试卷满分100分，请你合理分配到每个题目上。\n \n\n#题目内容：\n选择题：{{#1743261315926.text#}}\n\
+            填空题：{{#17432618817250.text#}}\n判断题：{{#17432637158480.text#}}\n编程题：{{#17432637257640.text#}}"
+        selected: false
+        title: 汇总试卷
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1743261924730'
+      position:
+        x: 1162.621977579844
+        y: 287.967096243561
+      positionAbsolute:
+        x: 1162.621977579844
+        y: 287.967096243561
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 2fd9e8ca-2e98-4222-abf3-c63b93455c63
+          role: system
+          text: "#角色：\n你是一个专家级抽题老师，擅长在文档中按要求抽题。\n\n#任务：\n从用户上传文档中找到【判断题】，并根据难度抽取题目。\n\
+            \n\n#要求：\n  -抽取数量{{#1743256781043.True_False#}}\n  -仅输出题目内容，不要输出其他提示信息\n\
+            \  \n\n\n#用户上传的文档是：{{#1743261098345.text#}}\n#用户选择的难度是：{{#1743256781043.Difficulty_Level#}}\n\
+            #用户选择的科目是：{{#1743256781043.subject#}}\n"
+        selected: false
+        title: 判断题-自动抽题  (1)
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17432637158480'
+      position:
+        x: 717.4557541176031
+        y: 584.1085375070397
+      positionAbsolute:
+        x: 717.4557541176031
+        y: 584.1085375070397
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 2fd9e8ca-2e98-4222-abf3-c63b93455c63
+          role: system
+          text: "#角色：\n你是一个专家级抽题老师，擅长在文档中按要求抽题。\n\n#任务：\n从用户上传文档中找到【编程题】，并根据难度抽取题目。\n\
+            \n\n#要求：\n  -抽取数量{{#1743256781043.Programming#}}\n  -仅输出题目内容，不要输出其他提示信息\n\
+            \  \n\n\n#用户上传的文档是：{{#1743261098345.text#}}\n#用户选择的难度是：{{#1743256781043.Difficulty_Level#}}\n\
+            #用户选择的科目是：{{#1743256781043.subject#}}\n"
+        selected: false
+        title: '编程题-自动抽题 '
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17432637257640'
+      position:
+        x: 717.4557541176031
+        y: 759.0556436609514
+      positionAbsolute:
+        x: 717.4557541176031
+        y: 759.0556436609514
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 12f19840-7768-47a1-877b-d5348c71903c
+          role: system
+          text: "#角色：\n你是一名专家级的C语言编程题出题老师。\n\n#任务：\n-需要生成大学C语言课后作业题。\n-本次你仅负责出【编程题】部分。\n\
+            \n#规则：\n  -抽取数量{{#1743256781043.Programming#}}\n  -请按[本次出题参考资料]进行合理出题；\n\
+            \  -出题难度一共三个级别分别是简单、中等、困难；\n     - 本次出题难度等级是{{#1743256781043.Difficulty_Level#}}\n\
+            \  -仅输出题目内容，不要输出其他提示信息。\n  -你只能出编程题，不要输出其他题型。\n\n\n#本次出题参考资料：\n{{#1743256781043.file#}}\n"
+        selected: false
+        title: AIGC编程题
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1743299713342'
+      position:
+        x: 708.7975328481783
+        y: 1465.6357701488844
+      positionAbsolute:
+        x: 708.7975328481783
+        y: 1465.6357701488844
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: 8c92c261-37d8-4118-aa85-ef2386bf273b
+            value: 从上传题库中抽取
+            varType: string
+            variable_selector:
+            - '1743256781043'
+            - Pattern_type
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 条件分支
+        type: if-else
+      height: 126
+      id: '1743301009569'
+      position:
+        x: -48.83234172284335
+        y: 177.91056584106042
+      positionAbsolute:
+        x: -48.83234172284335
+        y: 177.91056584106042
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 4b2c465f-6a4e-4c11-8aa7-118bcf0df8dc
+          role: system
+          text: "#角色：\n  你一个试卷格式整理大师。\n\n#任务：\n  你需要根据题目内容整理成一张格式标准的试卷；\n\n#试卷的科目是：{{#1743256781043.subject#}}\n\
+            \n#规则：\n  -试卷不要给出答案，题目内容中可能把答案放进去了，你帮我删除答案部分，只保留题目内容；\n  -试卷按选择题>判断题>填空题>编程题的顺序编撰，序号从1开始。\n\
+            \  -试卷满分100分，请你合理分配到每个题目上。\n \n\n#题目内容：\n选择题：{{#17433016653310.text#}}\n\
+            填空题：{{#17433016300070.text#}}\n判断题：{{#17433016085490.text#}}\n编程题：{{#1743299713342.text#}}"
+        selected: false
+        title: 'AIGC-汇总试卷 '
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17433015663120'
+      position:
+        x: 1124.611324939695
+        y: 1000.7883600905436
+      positionAbsolute:
+        x: 1124.611324939695
+        y: 1000.7883600905436
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 12f19840-7768-47a1-877b-d5348c71903c
+          role: system
+          text: "#角色：\n你是一名专家级的C语言编程题出题老师。\n\n#任务：\n-需要生成大学C语言课后作业题。\n-本次你仅负责出【判断题】部分。\n\
+            \n#规则：\n  -抽取数量{{#1743256781043.True_False#}}\n  -请按[本次出题参考资料]进行合理出题；\n\
+            \  -出题难度一共三个级别分别是简单、中等、困难；\n     - 本次出题难度等级是{{#1743256781043.Difficulty_Level#}}\n\
+            \  -仅输出题目内容，不要输出其他提示信息。\n  -你只能出判断题，不要输出其他题型。\n\n\n#本次出题参考资料：\n{{#1743256781043.file#}}\n"
+        selected: false
+        title: AIGC判断题
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17433016085490'
+      position:
+        x: 708.7975328481783
+        y: 1153.799955998034
+      positionAbsolute:
+        x: 708.7975328481783
+        y: 1153.799955998034
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 12f19840-7768-47a1-877b-d5348c71903c
+          role: system
+          text: "#角色：\n你是一名专家级的C语言编程题出题老师。\n\n#任务：\n-需要生成大学C语言课后作业题。\n-本次你仅负责出【填空题】部分。\n\
+            \n#规则：\n  -抽取数量{{#1743256781043.Gap_filling#}}\n  -请按[本次出题参考资料]进行合理出题；\n\
+            \  -出题难度一共三个级别分别是简单、中等、困难；\n     - 本次出题难度等级是{{#1743256781043.Difficulty_Level#}}\n\
+            \  -仅输出题目内容，不要输出其他提示信息。\n  -你只能出填空题，不要输出其他题型。\n\n\n#本次出题参考资料：\n{{#1743256781043.file#}}\n"
+        selected: false
+        title: 'AIGC填空题 '
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17433016300070'
+      position:
+        x: 708.7975328481783
+        y: 1306.0105065200876
+      positionAbsolute:
+        x: 708.7975328481783
+        y: 1306.0105065200876
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-r1:32b
+          provider: ollama
+        prompt_template:
+        - id: 12f19840-7768-47a1-877b-d5348c71903c
+          role: system
+          text: "#角色：\n你是一名专家级的C语言编程题出题老师。\n\n#任务：\n-需要生成大学C语言课后作业题。\n-本次你仅负责出【选择题】部分。\n\
+            \n#规则：\n  -抽取数量{{#1743256781043.choice#}}\n  -请按[本次出题参考资料]进行合理出题；\n  -出题难度一共三个级别分别是简单、中等、困难；\n\
+            \     - 本次出题难度等级是{{#1743256781043.Difficulty_Level#}}\n  -仅输出题目内容，不要输出其他提示信息。\n\
+            \  -你只能出选择题，不要输出其他题型。\n\n\n#本次出题参考资料：\n{{#1743256781043.file#}}\n"
+        selected: false
+        title: AIGC选择题
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17433016653310'
+      position:
+        x: 708.7975328481783
+        y: 1024.0994439238395
+      positionAbsolute:
+        x: 708.7975328481783
+        y: 1024.0994439238395
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: AIGC参考范围
+        type: document-extractor
+        variable_selector:
+        - '1743256781043'
+        - file
+      height: 92
+      id: '1743301907068'
+      position:
+        x: 222.23049404673668
+        y: 1024.0994439238395
+      positionAbsolute:
+        x: 222.23049404673668
+        y: 1024.0994439238395
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 82.57274146341354
+      y: -2.8313324724693985
+      zoom: 0.6821813080674762

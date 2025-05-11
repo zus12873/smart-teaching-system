@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}教师面板 - 智能教学系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-speedometer me-2"></i>教师面板</h1>
+    <p>课程与作业管理</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-journal-album fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">我的课程</h5>
+                <p class="card-text display-6">{{ courses|length }}</p>
+                <a href="{{ url_for('teacher_courses') }}" class="btn btn-sm btn-primary">查看课程</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-file-earmark-text fs-1 text-success mb-3"></i>
+                <h5 class="card-title">作业总数</h5>
+                <p class="card-text display-6">{{ assignments|length }}</p>
+                <a href="{{ url_for('teacher_create_assignment') }}" class="btn btn-sm btn-success">创建作业</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">最近作业</h5>
+                    <a href="{{ url_for('teacher_create_assignment') }}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>创建新作业
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if assignments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>作业名称</th>
+                                <th>所属课程</th>
+                                <th>创建时间</th>
+                                <th>题目数量</th>
+                                <th>已提交数量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr>
+                                <td>{{ assignment.title }}</td>
+                                <td>{{ assignment.course }}</td>
+                                <td>{{ assignment.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ assignment.problems_count }}</td>
+                                <td>{{ assignment.submissions_count }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ url_for('teacher_edit_assignment', assignment_id=assignment.id) }}" class="btn btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{{ url_for('teacher_view_submissions', assignment_id=assignment.id) }}" class="btn btn-outline-info">
+                                            <i class="bi bi-file-earmark-check"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">暂无作业数据</p>
+                    <a href="{{ url_for('teacher_create_assignment') }}" class="btn btn-outline-primary mt-2">
+                        <i class="bi bi-plus-circle me-1"></i>创建第一个作业
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">智能教学工具</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <i class="bi bi-journals fs-2 text-primary mb-3"></i>
+                                <h5>智能出题</h5>
+                                <p class="text-muted">根据教学需求自动生成各类型题目</p>
+                                <a href="{{ url_for('problem_generation') }}" class="btn btn-outline-primary">使用工具</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <i class="bi bi-check-circle fs-2 text-success mb-3"></i>
+                                <h5>智能批改</h5>
+                                <p class="text-muted">自动评阅学生提交的编程作业</p>
+                                <a href="{{ url_for('multi_upload') }}" class="btn btn-outline-success">使用工具</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <i class="bi bi-graph-up fs-2 text-info mb-3"></i>
+                                <h5>学习分析</h5>
+                                <p class="text-muted">分析学生的学习情况和表现</p>
+                                <button class="btn btn-outline-info" disabled>即将推出</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

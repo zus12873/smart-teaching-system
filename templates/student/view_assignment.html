@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}{{ assignment.title }} - 智能教学系统{% endblock %}
+
+{% block styles %}
+.problem-card {
+    border-left: 3px solid #3c6e71;
+    margin-bottom: 20px;
+}
+.grading-result {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin-top: 10px;
+}
+.score-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.score-high {
+    color: #28a745;
+}
+.score-medium {
+    color: #fd7e14;
+}
+.score-low {
+    color: #dc3545;
+}
+.answer-textarea {
+    font-family: monospace;
+    min-height: 200px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1><i class="bi bi-file-earmark-text me-2"></i>{{ assignment.title }}</h1>
+        <div>
+            <a href="{{ url_for('student_dashboard') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>返回主页
+            </a>
+        </div>
+    </div>
+    <p class="text-muted">{{ assignment.course.name }} - {{ assignment.description or '暂无描述' }}</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-1">作业状态</h5>
+                        <p class="card-text text-muted">
+                            {% if assignment.due_date %}
+                            截止日期: {{ assignment.due_date.strftime('%Y-%m-%d') }}
+                            {% else %}
+                            无截止日期
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        {% if submission %}
+                            {% if submission.is_graded %}
+                            <span class="badge rounded-pill bg-success p-2">已评分</span>
+                            {% else %}
+                            <span class="badge rounded-pill bg-warning p-2">已提交，待评分</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge rounded-pill bg-danger p-2">未提交</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-1">作业完成情况</h5>
+                        <p class="card-text text-muted">
+                            共 {{ problems|length }} 道题目
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        {% if submission %}
+                            {% set completed = 0 %}
+                            {% for problem in problems %}
+                                {% if problem_submissions.get(problem.id) %}
+                                    {% set completed = completed + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            <div class="progress" style="width: 100px; height: 20px;">
+                                {% set percentage = (completed / problems|length * 100)|int %}
+                                <div class="progress-bar 
+                                    {% if percentage == 100 %}bg-success
+                                    {% elif percentage >= 50 %}bg-warning
+                                    {% else %}bg-danger{% endif %}" 
+                                    role="progressbar" style="width: {{ percentage }}%;" 
+                                    aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ percentage }}%
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="progress" style="width: 100px; height: 20px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% if submission and submission.is_graded %}
+        <div class="alert alert-success mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="alert-heading"><i class="bi bi-trophy me-2"></i>作业已评分</h5>
+                    <p class="mb-0">您已完成此作业并获得了评分。您仍然可以查看题目和您的答案。</p>
+                </div>
+                <div>
+                    <span class="score-display 
+                        {% if submission.total_score >= 80 %}score-high
+                        {% elif submission.total_score >= 60 %}score-medium
+                        {% else %}score-low{% endif %}">
+                        {{ submission.total_score }}
+                    </span>
+                    <span class="text-muted">/100</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <form id="allAnswersForm">
+            <div id="problem-accordion" class="accordion">
+                {% for problem in problems %}
+                    <div class="accordion-item problem-card mb-4">
+                        <h2 class="accordion-header" id="heading-{{ problem.id }}">
+                            <button class="accordion-button {% if loop.index != 1 %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ problem.id }}" aria-expanded="{{ 'true' if loop.index == 1 else 'false' }}" aria-controls="collapse-{{ problem.id }}">
+                                <div class="d-flex justify-content-between w-100 me-3">
+                                    <span>题目 {{ problem.order }}：{{ problem.problem_text|truncate(50)|striptags }}</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="collapse-{{ problem.id }}" class="accordion-collapse collapse {% if loop.index == 1 %}show{% endif %}" aria-labelledby="heading-{{ problem.id }}" data-bs-parent="#problem-accordion">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card mb-3">
+                                            <div class="card-header">题目内容</div>
+                                            <div class="card-body">
+                                                <div class="markdown-preview">{{ problem.problem_text|safe }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="card mb-3">
+                                            <div class="card-header">我的答案</div>
+                                            <div class="card-body">
+                                                <textarea class="form-control answer-textarea" name="answer_{{ problem.id }}" rows="8" placeholder="在此输入您的答案...">{% if problem_submissions.get(problem.id) %}{{ problem_submissions[problem.id].answer }}{% endif %}</textarea>
+                                            </div>
+                                        </div>
+                                        {% if problem_submissions.get(problem.id) and problem_submissions[problem.id].grading_result %}
+                                        <div class="card mb-3">
+                                            <div class="card-header">评分结果</div>
+                                            <div class="card-body">
+                                                <div class="grading-result">{{ problem_submissions[problem.id].grading_result|safe }}</div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-send me-1"></i>提交全部答案</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 提交结果模态框 -->
+<div class="modal fade" id="submissionResultModal" tabindex="-1" aria-labelledby="submissionResultModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="submissionResultModalLabel">提交结果</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="submission-success" class="d-none">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center">答案提交成功！</p>
+                    <div id="grading-result-container" class="d-none">
+                        <div class="card">
+                            <div class="card-header bg-light">评分结果</div>
+                            <div class="card-body">
+                                <div id="grading-result-content"></div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <p>得分: <span id="grading-score" class="fw-bold"></span>/100</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="submission-error" class="d-none">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center" id="error-message">答案提交失败</p>
+                </div>
+                <div id="submission-loading">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">提交中...</span>
+                        </div>
+                        <p>提交答案中，请稍候...</p>
+                        <p class="text-muted small">AI评分可能需要几秒钟时间</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="refresh-page-btn">刷新页面</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // 使用Markdown渲染题目内容
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.markdown-preview').forEach(container => {
+            const content = container.textContent.trim();
+            container.innerHTML = marked.parse(content);
+        });
+        document.querySelectorAll('.grading-result').forEach(container => {
+            const content = container.textContent.trim();
+            container.innerHTML = marked.parse(content);
+        });
+    });
+    // 刷新页面按钮
+    document.getElementById('refresh-page-btn').addEventListener('click', function() {
+        window.location.reload();
+    });
+    // 结构化提交全部答案
+    const allAnswersForm = document.getElementById('allAnswersForm');
+    if (allAnswersForm) {
+        allAnswersForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(allAnswersForm);
+            const answers = {};
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('answer_')) {
+                    const problemId = key.replace('answer_', '');
+                    answers[problemId] = value;
+                }
+            }
+            fetch("{{ url_for('student_submit_assignment', assignment_id=assignment.id) }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({answers: answers})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('提交成功！');
+                    window.location.reload();
+                } else {
+                    alert(data.error || '提交失败');
+                }
+            })
+            .catch(() => {
+                alert('网络错误，提交失败');
+            });
+        });
+    }
+</script>
+{% endblock %} 

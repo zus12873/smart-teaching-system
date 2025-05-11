@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block title %}查看提交 - {{ assignment.title }}{% endblock %}
+
+{% block styles %}
+.submission-card {
+    transition: all 0.3s;
+}
+.submission-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.score-indicator {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.score-high {
+    color: #28a745;
+}
+.score-medium {
+    color: #fd7e14;
+}
+.score-low {
+    color: #dc3545;
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1><i class="bi bi-file-earmark-check me-2"></i>作业提交情况</h1>
+        <div>
+            <a href="{{ url_for('teacher_course_detail', course_id=assignment.course_id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>返回课程
+            </a>
+        </div>
+    </div>
+    <p class="text-muted">{{ assignment.course.name }} - {{ assignment.title }}</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-people fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">学生总数</h5>
+                <p class="card-text display-6">{{ assignment.course.enrollments|length }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-file-earmark-check fs-1 text-success mb-3"></i>
+                <h5 class="card-title">已提交数量</h5>
+                <p class="card-text display-6">{{ submissions|length }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-trophy fs-1 text-warning mb-3"></i>
+                <h5 class="card-title">平均分数</h5>
+                {% set total_score = 0 %}
+                {% set graded_count = 0 %}
+                {% for submission in submissions %}
+                    {% if submission.is_graded %}
+                        {% set total_score = total_score + submission.total_score %}
+                        {% set graded_count = graded_count + 1 %}
+                    {% endif %}
+                {% endfor %}
+                {% if graded_count > 0 %}
+                    {% set avg_score = total_score / graded_count %}
+                    <p class="card-text display-6">{{ "%.1f"|format(avg_score) }}</p>
+                {% else %}
+                    <p class="card-text display-6">-</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">提交列表</h5>
+                    <div class="input-group" style="width: 250px;">
+                        <input type="text" class="form-control" placeholder="搜索学生..." id="searchInput">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if submissions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>学生</th>
+                                <th>提交时间</th>
+                                <th>完成题目</th>
+                                <th>评分状态</th>
+                                <th>总分</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for submission in submissions %}
+                            <tr class="submission-row">
+                                <td>{{ submission.student.username }}</td>
+                                <td>{{ submission.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ submission.problem_submissions|length }}/{{ assignment.problems|length }}</td>
+                                <td>
+                                    {% if submission.is_graded %}
+                                    <span class="badge bg-success">已评分</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">待评分</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if submission.is_graded %}
+                                    <span class="
+                                        {% if submission.total_score >= 80 %}score-high
+                                        {% elif submission.total_score >= 60 %}score-medium
+                                        {% else %}score-low{% endif %}
+                                        ">{{ submission.total_score }}</span>
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#submissionModal-{{ submission.id }}">
+                                        <i class="bi bi-eye me-1"></i>查看详情
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <p class="text-muted">暂无学生提交作业</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for submission in submissions %}
+<!-- 提交详情模态框 -->
+<div class="modal fade" id="submissionModal-{{ submission.id }}" tabindex="-1" aria-labelledby="submissionModalLabel-{{ submission.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="submissionModalLabel-{{ submission.id }}">
+                    {{ submission.student.username }} 的提交详情
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <p class="mb-1"><strong>提交时间:</strong> {{ submission.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        <p class="mb-1"><strong>学生:</strong> {{ submission.student.username }} ({{ submission.student.email }})</p>
+                    </div>
+                    <div class="text-end">
+                        <p class="mb-1">
+                            <strong>状态:</strong> 
+                            {% if submission.is_graded %}
+                            <span class="badge bg-success">已评分</span>
+                            {% else %}
+                            <span class="badge bg-warning">待评分</span>
+                            {% endif %}
+                        </p>
+                        <p class="mb-1">
+                            <strong>总分:</strong> 
+                            {% if submission.is_graded %}
+                            <span class="
+                                {% if submission.total_score >= 80 %}text-success
+                                {% elif submission.total_score >= 60 %}text-warning
+                                {% else %}text-danger{% endif %}
+                                ">{{ submission.total_score }}</span>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="accordion" id="submissionAccordion-{{ submission.id }}">
+                    {% for problem in assignment.problems %}
+                    {% set prob_sub = None %}
+                    {% for ps in submission.problem_submissions %}
+                        {% if ps.problem_id == problem.id %}
+                            {% set prob_sub = ps %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading-{{ submission.id }}-{{ problem.id }}">
+                            <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ submission.id }}-{{ problem.id }}" aria-expanded="{{ 'true' if loop.first else 'false' }}" aria-controls="collapse-{{ submission.id }}-{{ problem.id }}">
+                                <div class="d-flex justify-content-between w-100 me-3">
+                                    <span>第 {{ problem.order }} 题</span>
+                                    {% if prob_sub %}
+                                        {% if prob_sub.score is not none %}
+                                        <span class="badge bg-primary">得分: {{ prob_sub.score }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">未评分</span>
+                                        {% endif %}
+                                    {% else %}
+                                    <span class="badge bg-danger">未提交</span>
+                                    {% endif %}
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="collapse-{{ submission.id }}-{{ problem.id }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading-{{ submission.id }}-{{ problem.id }}" data-bs-parent="#submissionAccordion-{{ submission.id }}">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header">题目</div>
+                                            <div class="card-body">
+                                                <div class="markdown-preview">{{ problem.problem_text|safe }}</div>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if prob_sub %}
+                                        <div class="card">
+                                            <div class="card-header">学生答案</div>
+                                            <div class="card-body">
+                                                <pre class="mb-0"><code>{{ prob_sub.answer }}</code></pre>
+                                            </div>
+                                        </div>
+                                        {% else %}
+                                        <div class="alert alert-warning">
+                                            学生未提交此题的答案
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        {% if problem.reference_answer %}
+                                        <div class="card mb-3">
+                                            <div class="card-header">参考答案</div>
+                                            <div class="card-body">
+                                                <div class="markdown-preview">{{ problem.reference_answer|safe }}</div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if prob_sub and prob_sub.grading_result %}
+                                        <div class="card">
+                                            <div class="card-header">AI评分结果</div>
+                                            <div class="card-body">
+                                                <div class="markdown-preview">{{ prob_sub.grading_result|safe }}</div>
+                                            </div>
+                                        </div>
+                                        {% elif prob_sub %}
+                                        <div class="card">
+                                            <div class="card-header">评分</div>
+                                            <div class="card-body">
+                                                <form id="gradeForm-{{ prob_sub.id }}" data-problem-submission-id="{{ prob_sub.id }}">
+                                                    <div class="mb-3">
+                                                        <label for="score-{{ prob_sub.id }}" class="form-label">分数</label>
+                                                        <input type="number" class="form-control" id="score-{{ prob_sub.id }}" name="score" min="0" max="100" value="{{ prob_sub.score or 0 }}">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="feedback-{{ prob_sub.id }}" class="form-label">反馈意见</label>
+                                                        <textarea class="form-control" id="feedback-{{ prob_sub.id }}" name="feedback" rows="3"></textarea>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between">
+                                                        <button type="button" class="btn btn-primary manual-grade-btn" data-problem-submission-id="{{ prob_sub.id }}">
+                                                            手动评分
+                                                        </button>
+                                                        <button type="button" class="btn btn-success ai-grade-btn" data-problem-submission-id="{{ prob_sub.id }}">
+                                                            <i class="bi bi-robot me-1"></i>AI自动评分
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 搜索功能
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        document.querySelectorAll('.submission-row').forEach(row => {
+            const studentName = row.cells[0].textContent.toLowerCase();
+            if (studentName.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // 手动评分
+    document.querySelectorAll('.manual-grade-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const problemSubmissionId = this.getAttribute('data-problem-submission-id');
+            const form = document.getElementById('gradeForm-' + problemSubmissionId);
+            const score = form.querySelector('[name="score"]').value;
+            const feedback = form.querySelector('[name="feedback"]').value;
+            
+            // 发送Ajax请求保存评分
+            alert('正在保存评分: ' + score + ' 分');
+            // 这里应该实现与后端的交互
+        });
+    });
+    
+    // AI自动评分
+    document.querySelectorAll('.ai-grade-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const problemSubmissionId = this.getAttribute('data-problem-submission-id');
+            alert('触发AI自动评分，ID: ' + problemSubmissionId);
+            // 这里应该实现与后端的交互
+        });
+    });
+    
+    // 使用Markdown渲染
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.markdown-preview').forEach(element => {
+            const content = element.textContent.trim();
+            element.innerHTML = marked.parse(content);
+        });
+    });
+</script>
+{% endblock %} 

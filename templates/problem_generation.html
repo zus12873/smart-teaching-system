@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+
+{% block title %}智能题目生成 - 智能教学系统{% endblock %}
+
+{% block styles %}
+.result-container {
+    border: 1px solid #e9ecef;
+    border-radius: 0.25rem;
+    padding: 15px;
+    max-height: 500px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+}
+.loading-spinner {
+    display: none;
+    text-align: center;
+    margin: 20px 0;
+}
+.markdown-content h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+.markdown-content h2 {
+    font-size: 1.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: #3c6e71;
+}
+.markdown-content ul, .markdown-content ol {
+    padding-left: 1.5rem;
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-magic me-2"></i>智能题目生成</h1>
+    <p>基于AI的智能题目生成系统，可根据需求自动生成各类型题目</p>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">生成题目配置</h5>
+            </div>
+            <div class="card-body">
+                <form id="problemGenerationForm" method="POST" action="{{ url_for('run_workflow') }}" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">学科领域</label>
+                                <select class="form-select" id="subject" name="subject" required>
+                                    <option value="计算机" selected>计算机</option>
+                                    <option value="数学">数学</option>
+                                    <option value="物理">物理</option>
+                                    <option value="化学">化学</option>
+                                    <option value="生物">生物</option>
+                                    <option value="语文">语文</option>
+                                    <option value="英语">英语</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="difficulty" class="form-label">难度级别</label>
+                                <select class="form-select" id="difficulty" name="difficulty" required>
+                                    <option value="简单">简单</option>
+                                    <option value="中等" selected>中等</option>
+                                    <option value="困难">困难</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="pattern_type" class="form-label">生成模式</label>
+                                <select class="form-select" id="pattern_type" name="pattern_type" required>
+                                    <option value="从上传题库中抽取" selected>从上传题库中抽取</option>
+                                    <option value="参考资料自动生成">参考资料自动生成</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">题目类型与数量</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">选择题</span>
+                                    <input type="number" class="form-control" id="choice" name="choice" min="0" value="1">
+                                </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">判断题</span>
+                                    <input type="number" class="form-control" id="true_false" name="true_false" min="0" value="1">
+                                </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">填空题</span>
+                                    <input type="number" class="form-control" id="gap_filling" name="gap_filling" min="0" value="1">
+                                </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">编程题</span>
+                                    <input type="number" class="form-control" id="programming" name="programming" min="0" value="1">
+                                </div>
+                                <div class="form-text">输入0表示不生成该类型题目</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="file" class="form-label">上传题库文件</label>
+                                <input type="file" class="form-control" id="file" name="file" required>
+                                <div class="form-text">支持TXT格式的题库文件</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary" id="generateBtn">
+                            <i class="bi bi-magic me-1"></i>生成题目
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>返回首页
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4" id="resultCard" style="display: none;">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">生成结果</h5>
+                    <button class="btn btn-sm btn-outline-secondary" id="printBtn">
+                        <i class="bi bi-printer me-1"></i>打印
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">加载中...</span>
+                    </div>
+                    <p class="mt-2">AI正在生成题目，请稍候...</p>
+                </div>
+                
+                <div id="resultContent" class="result-container markdown-content">
+                    <!-- 这里将显示生成的题目 -->
+                </div>
+                
+                <div class="mt-3 text-end">
+                    <button class="btn btn-success" id="copyResultBtn" style="display: none;">
+                        <i class="bi bi-clipboard me-1"></i>复制结果
+                    </button>
+                    <button class="btn btn-primary" id="saveToAssignmentBtn" style="display: none;">
+                        <i class="bi bi-save me-1"></i>保存为作业
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">使用说明</h5>
+            </div>
+            <div class="card-body">
+                <p>智能题目生成系统使用指南：</p>
+                <ol>
+                    <li>选择学科领域和难度级别</li>
+                    <li>选择生成模式：从上传题库抽取或自动生成</li>
+                    <li>输入各类型题目的数量，输入0表示不生成该类型</li>
+                    <li>上传题库文件（TXT格式）</li>
+                    <li>点击"生成题目"按钮开始生成</li>
+                </ol>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-1"></i>提示：生成的题目可以直接保存为作业，或复制结果用于其他用途。每种题型数量建议不超过5个，以保证生成质量。
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 保存作业模态框 -->
+<div class="modal fade" id="saveAssignmentModal" tabindex="-1" aria-labelledby="saveAssignmentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="saveAssignmentModalLabel">保存为作业</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="saveAssignmentForm">
+          <div class="mb-3">
+            <label for="assignmentTitle" class="form-label">作业标题</label>
+            <input type="text" class="form-control" id="assignmentTitle" required>
+          </div>
+          <div class="mb-3">
+            <label for="courseSelect" class="form-label">选择课程</label>
+            <select class="form-select" id="courseSelect" required>
+              <option selected disabled value="">请选择课程...</option>
+              <!-- 这里应通过AJAX加载课程列表 -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="assignmentDescription" class="form-label">作业描述</label>
+            <textarea class="form-control" id="assignmentDescription" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="dueDate" class="form-label">截止日期（可选）</label>
+            <input type="date" class="form-control" id="dueDate">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="confirmSaveBtn">保存作业</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const problemForm = document.getElementById('problemGenerationForm');
+    const resultCard = document.getElementById('resultCard');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const resultContent = document.getElementById('resultContent');
+    const copyResultBtn = document.getElementById('copyResultBtn');
+    const saveToAssignmentBtn = document.getElementById('saveToAssignmentBtn');
+    const patternTypeSelect = document.getElementById('pattern_type');
+    const fileInput = document.getElementById('file');
+    const printBtn = document.getElementById('printBtn');
+    
+    // 根据生成模式更改文件上传必要性
+    patternTypeSelect.addEventListener('change', function() {
+        if (this.value === '自动生成') {
+            fileInput.removeAttribute('required');
+            fileInput.parentElement.classList.add('opacity-50');
+        } else {
+            fileInput.setAttribute('required', '');
+            fileInput.parentElement.classList.remove('opacity-50');
+        }
+    });
+    
+    // 验证题目数量
+    function validateQuestionCounts() {
+        const choice = parseInt(document.getElementById('choice').value) || 0;
+        const trueFalse = parseInt(document.getElementById('true_false').value) || 0;
+        const gapFilling = parseInt(document.getElementById('gap_filling').value) || 0;
+        const programming = parseInt(document.getElementById('programming').value) || 0;
+        
+        const total = choice + trueFalse + gapFilling + programming;
+        
+        if (total <= 0) {
+            alert('请至少选择一种题型并输入数量');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // 表单提交处理
+    problemForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 验证题目数量
+        if (!validateQuestionCounts()) {
+            return;
+        }
+        
+        // 显示结果卡片和加载动画
+        resultCard.style.display = 'block';
+        loadingSpinner.style.display = 'block';
+        resultContent.innerHTML = '';
+        copyResultBtn.style.display = 'none';
+        saveToAssignmentBtn.style.display = 'none';
+        
+        // 滚动到结果区域
+        resultCard.scrollIntoView({ behavior: 'smooth' });
+        
+        // 创建FormData对象
+        const formData = new FormData(this);
+        
+        // 发送请求
+        fetch('{{ url_for("run_workflow") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // 隐藏加载动画
+            loadingSpinner.style.display = 'none';
+            
+            if (data.error) {
+                // 显示错误信息
+                resultContent.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            } else if (data.data && data.data.outputs && data.data.outputs.output1) {
+                // 只渲染output1字段
+                const output = data.data.outputs.output1;
+                resultContent.innerHTML = marked.parse(output);
+                
+                // 显示操作按钮
+                copyResultBtn.style.display = 'inline-block';
+                saveToAssignmentBtn.style.display = 'inline-block';
+            } else {
+                resultContent.innerHTML = '<div class="alert alert-warning">未生成任何结果，请调整参数后重试。</div>';
+            }
+        })
+        .catch(error => {
+            loadingSpinner.style.display = 'none';
+            resultContent.innerHTML = `<div class="alert alert-danger">请求失败: ${error.message}</div>`;
+        });
+    });
+    
+    // 复制结果
+    copyResultBtn.addEventListener('click', function() {
+        const text = resultContent.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('结果已复制到剪贴板');
+        }).catch(err => {
+            console.error('复制失败:', err);
+            alert('复制失败，请手动选择并复制');
+        });
+    });
+    
+    // 打印结果
+    printBtn.addEventListener('click', function() {
+        const printWindow = window.open('', '_blank');
+        const content = resultContent.innerHTML;
+        
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>智能生成题目</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    h1 { font-size: 1.8rem; }
+                    h2 { font-size: 1.5rem; color: #3c6e71; margin-top: 20px; }
+                </style>
+            </head>
+            <body>
+                ${content}
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
+    });
+    
+    // 保存为作业按钮
+    saveToAssignmentBtn.addEventListener('click', function() {
+        // 显示模态框
+        const modal = new bootstrap.Modal(document.getElementById('saveAssignmentModal'));
+        modal.show();
+        
+        // 加载课程列表
+        loadCourseList();
+    });
+    
+    // 加载课程列表
+    function loadCourseList() {
+        const courseSelect = document.getElementById('courseSelect');
+        
+        // 发送AJAX请求获取教师课程列表
+        fetch('{{ url_for("teacher_courses_api") }}')
+        .then(response => response.json())
+        .then(data => {
+            courseSelect.innerHTML = '<option selected disabled value="">请选择课程...</option>';
+            
+            if (data.courses && data.courses.length > 0) {
+                data.courses.forEach(course => {
+                    courseSelect.innerHTML += `<option value="${course.id}">${course.name}</option>`;
+                });
+            } else {
+                courseSelect.innerHTML += '<option disabled>暂无可用课程</option>';
+            }
+        })
+        .catch(error => {
+            console.error('获取课程列表失败:', error);
+            courseSelect.innerHTML = `
+                <option selected disabled value="">请选择课程...</option>
+                <option disabled>获取课程列表失败</option>
+            `;
+        });
+    }
+    
+    // 确认保存作业
+    document.getElementById('confirmSaveBtn').addEventListener('click', function() {
+        const title = document.getElementById('assignmentTitle').value;
+        const courseId = document.getElementById('courseSelect').value;
+        const description = document.getElementById('assignmentDescription').value;
+        const dueDate = document.getElementById('dueDate').value;
+        const problemContent = resultContent.innerHTML;
+        
+        if (!title || !courseId) {
+            alert('请填写必要信息');
+            return;
+        }
+        
+        // 显示保存中提示
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 保存中...';
+        
+        // 发送请求保存作业
+        fetch('{{ url_for("save_generated_assignment") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: title,
+                course_id: courseId,
+                description: description,
+                due_date: dueDate,
+                problem_content: problemContent
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            this.disabled = false;
+            this.innerHTML = '保存作业';
+            
+            if (data.success) {
+                // 关闭模态框
+                const modal = bootstrap.Modal.getInstance(document.getElementById('saveAssignmentModal'));
+                modal.hide();
+                
+                // 显示成功提示
+                resultContent.innerHTML = `
+                    <div class="alert alert-success">
+                        <h4><i class="bi bi-check-circle me-2"></i>作业保存成功!</h4>
+                        <p>作业已成功添加到课程: ${data.course_name}</p>
+                        <div class="mt-3">
+                            <a href="${data.assignment_url}" class="btn btn-primary">
+                                <i class="bi bi-pencil me-1"></i>编辑作业
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                // 隐藏操作按钮
+                copyResultBtn.style.display = 'none';
+                saveToAssignmentBtn.style.display = 'none';
+            } else {
+                alert(`保存失败: ${data.error || '未知错误'}`);
+            }
+        })
+        .catch(error => {
+            console.error('保存作业失败:', error);
+            this.disabled = false;
+            this.innerHTML = '保存作业';
+            alert('保存失败，请稍后再试');
+        });
+    });
+});
+</script>
+{% endblock %}

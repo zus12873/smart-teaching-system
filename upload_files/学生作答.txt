@@ -1,0 +1,19 @@
+#include <studio.h>  // 错误1：头文件拼写错误
+
+main() {             // 错误2：缺少返回类型int
+    int n, i;
+    int fact;        // 错误3：未初始化变量且未用long long
+
+    printf("输入一个数字：");
+    scanf("%d", n);  // 错误4：缺少&符号
+
+    if (n == 0) {
+        fact = 1;    // 正确部分：处理n=0的情况
+    }
+
+    for (i = 2; i <= n; i++) {  // 错误5：循环从2开始，漏乘1
+        fact *= i;
+    }
+
+    printf("%d! 结果是 %d", n, fact);  // 错误6：输出格式不匹配
+}

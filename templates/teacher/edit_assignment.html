@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+
+{% block title %}编辑作业 - {{ assignment.title }}{% endblock %}
+
+{% block styles %}
+.problem-card {
+    border-left: 3px solid #3c6e71;
+    margin-bottom: 15px;
+}
+.problem-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+.drag-handle {
+    cursor: move;
+    color: #aaa;
+}
+.markdown-preview {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin-top: 10px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1><i class="bi bi-file-earmark-text me-2"></i>编辑作业</h1>
+        <div>
+            <a href="{{ url_for('teacher_course_detail', course_id=assignment.course_id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>返回课程
+            </a>
+        </div>
+    </div>
+    <p class="text-muted">{{ assignment.course.name }} - {{ assignment.title }}</p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">作业信息</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('teacher_edit_assignment', assignment_id=assignment.id) }}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">作业标题</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ assignment.title }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">作业描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ assignment.description or '' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="due_date" class="form-label">截止日期</label>
+                        <input type="date" class="form-control" id="due_date" name="due_date" value="{{ assignment.due_date.strftime('%Y-%m-%d') if assignment.due_date else '' }}">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">保存作业信息</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">添加题目</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addProblemModal">
+                        <i class="bi bi-plus-circle me-1"></i>手动添加题目
+                    </button>
+                    
+                    <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#generateProblemModal">
+                        <i class="bi bi-magic me-1"></i>智能生成题目
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">题目列表</h5>
+                    <span class="badge bg-primary">{{ problems|length }} 题</span>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if problems %}
+                <div id="problem-list">
+                    {% for problem in problems %}
+                    <div class="card problem-card" id="problem-{{ problem.id }}">
+                        <div class="card-body">
+                            <div class="problem-actions">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('teacher_edit_problem', problem_id=problem.id) }}" class="btn btn-outline-primary" title="编辑题目">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" title="删除题目" onclick="deleteProblem({{ problem.id }})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary drag-handle" title="拖动排序">
+                                        <i class="bi bi-grip-vertical"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <h5 class="card-title">第 {{ problem.order }} 题</h5>
+                            <div class="markdown-preview">
+                                {{ problem.problem_text|safe }}
+                            </div>
+                            
+                            {% if problem.reference_answer %}
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#answer-{{ problem.id }}">
+                                    显示参考答案
+                                </button>
+                                <div class="collapse mt-2" id="answer-{{ problem.id }}">
+                                    <div class="card card-body">
+                                        {{ problem.reference_answer|safe }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <p class="text-muted">暂无题目，请使用右侧面板添加题目</p>
+                    <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addProblemModal">
+                        <i class="bi bi-plus-circle me-1"></i>添加第一个题目
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 手动添加题目模态框 -->
+<div class="modal fade" id="addProblemModal" tabindex="-1" aria-labelledby="addProblemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProblemModalLabel">添加题目</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addProblemForm" method="POST" action="{{ url_for('teacher_edit_assignment', assignment_id=assignment.id) }}">
+                    <div class="mb-3">
+                        <label for="problem_text" class="form-label">题目内容</label>
+                        <textarea class="form-control" id="problem_text" name="problem_text" rows="5" required></textarea>
+                        <div class="form-text">支持Markdown格式</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="reference_answer" class="form-label">参考答案</label>
+                        <textarea class="form-control" id="reference_answer" name="reference_answer" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="grading_criteria" class="form-label">评分标准</label>
+                        <textarea class="form-control" id="grading_criteria" name="grading_criteria" rows="3"></textarea>
+                        <div class="form-text">描述如何评分，AI批改系统将参考这些标准</div>
+                    </div>
+                    
+                    <input type="hidden" name="action" value="add_problem">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('addProblemForm').submit()">添加题目</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 智能生成题目模态框 -->
+<div class="modal fade" id="generateProblemModal" tabindex="-1" aria-labelledby="generateProblemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generateProblemModalLabel">智能生成题目</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="generateProblemForm">
+                    <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">学科领域</label>
+                                <select class="form-select" id="subject" name="subject">
+                                    <option value="计算机" selected>计算机</option>
+                                    <option value="数学">数学</option>
+                                    <option value="物理">物理</option>
+                                    <option value="化学">化学</option>
+                                    <option value="生物">生物</option>
+                                    <option value="语文">语文</option>
+                                    <option value="英语">英语</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="difficulty" class="form-label">难度级别</label>
+                                <select class="form-select" id="difficulty" name="difficulty">
+                                    <option value="简单">简单</option>
+                                    <option value="中等" selected>中等</option>
+                                    <option value="困难">困难</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="pattern_type" class="form-label">生成模式</label>
+                                <select class="form-select" id="pattern_type" name="pattern_type">
+                                    <option value="从上传题库中抽取" selected>从上传题库中抽取</option>
+                                    <option value="参考资料自动生成">参考资料自动生成</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">题目类型与数量</label>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">选择题</span>
+                                    <input type="number" class="form-control" id="choice" name="choice" min="0" value="1">
+                                </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">判断题</span>
+                                    <input type="number" class="form-control" id="true_false" name="true_false" min="0" value="1">
+                                </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">填空题</span>
+                                    <input type="number" class="form-control" id="gap_filling" name="gap_filling" min="0" value="1">
+                                </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">编程题</span>
+                                    <input type="number" class="form-control" id="programming" name="programming" min="0" value="1">
+                                </div>
+                                <div class="form-text">输入0表示不生成该类型题目</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="file" class="form-label">上传题库（可选）</label>
+                                <input type="file" class="form-control" id="file" name="file">
+                                <div class="form-text">上传题库文件，AI将从中抽取相关题目</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-1"></i>建议每种题型数量不超过5个，以保证生成质量。
+                    </div>
+                    
+                    <div id="generation-result" class="d-none">
+                        <div class="card mt-3">
+                            <div class="card-header">生成的题目预览</div>
+                            <div class="card-body">
+                                <div id="generated-problem-text" class="markdown-preview"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="generation-error" class="d-none">
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            <span id="error-message"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="spinner-border text-primary d-none" id="generation-spinner" role="status">
+                    <span class="visually-hidden">生成中...</span>
+                </div>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="generateButton" onclick="generateProblem()">生成题目</button>
+                <button type="button" class="btn btn-success d-none" id="saveGeneratedButton">保存题目</button>
+                <button type="button" class="btn btn-outline-info d-none" id="printGeneratedBtn">
+                    <i class="bi bi-printer me-1"></i>打印
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    // 删除题目
+    function deleteProblem(problemId) {
+        if (confirm('确定要删除这个题目吗？')) {
+            // 这里应该发送Ajax请求到后端删除题目
+            console.log('删除题目ID:', problemId);
+        }
+    }
+    
+    // 题目数量验证
+    function validateQuestionCounts() {
+        const choice = parseInt(document.getElementById('choice').value) || 0;
+        const trueFalse = parseInt(document.getElementById('true_false').value) || 0;
+        const gapFilling = parseInt(document.getElementById('gap_filling').value) || 0;
+        const programming = parseInt(document.getElementById('programming').value) || 0;
+        
+        const total = choice + trueFalse + gapFilling + programming;
+        
+        if (total <= 0) {
+            alert('请至少选择一种题型并输入数量');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // 根据生成模式设置文件上传
+    document.getElementById('pattern_type').addEventListener('change', function() {
+        const fileInput = document.getElementById('file');
+        if (this.value === '参考资料自动生成') {
+            fileInput.removeAttribute('required');
+            fileInput.parentElement.classList.add('opacity-50');
+        } else {
+            fileInput.parentElement.classList.remove('opacity-50');
+        }
+    });
+    
+    // 智能生成题目
+    function generateProblem() {
+        // 验证题目数量
+        if (!validateQuestionCounts()) {
+            return;
+        }
+        
+        const form = document.getElementById('generateProblemForm');
+        const formData = new FormData(form);
+        
+        // 显示加载动画
+        document.getElementById('generation-spinner').classList.remove('d-none');
+        document.getElementById('generateButton').disabled = true;
+        document.getElementById('generation-result').classList.add('d-none');
+        document.getElementById('generation-error').classList.add('d-none');
+        
+        // 发送Ajax请求
+        fetch('{{ url_for("teacher_generate_problem") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // 隐藏加载动画
+            document.getElementById('generation-spinner').classList.add('d-none');
+            document.getElementById('generateButton').disabled = false;
+            
+            if (data.success) {
+                // 显示生成的结果 - 使用Markdown渲染
+                const problemText = data.problem.text;
+                document.getElementById('generated-problem-text').innerHTML = marked.parse(problemText);
+                document.getElementById('generation-result').classList.remove('d-none');
+                
+                // 显示保存按钮和打印按钮
+                document.getElementById('generateButton').classList.add('d-none');
+                document.getElementById('saveGeneratedButton').classList.remove('d-none');
+                document.getElementById('printGeneratedBtn').classList.remove('d-none');
+                
+                // 为保存按钮添加点击事件
+                document.getElementById('saveGeneratedButton').onclick = function() {
+                    // 刷新页面或添加到题目列表
+                    window.location.reload();
+                };
+                
+                // 为打印按钮添加点击事件
+                document.getElementById('printGeneratedBtn').onclick = function() {
+                    printGeneratedProblem(problemText);
+                };
+            } else {
+                // 显示错误信息
+                document.getElementById('error-message').textContent = data.error || '生成题目失败';
+                document.getElementById('generation-error').classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            // 隐藏加载动画并显示错误
+            document.getElementById('generation-spinner').classList.add('d-none');
+            document.getElementById('generateButton').disabled = false;
+            document.getElementById('error-message').textContent = '请求出错: ' + error;
+            document.getElementById('generation-error').classList.remove('d-none');
+        });
+    }
+    
+    // 打印生成的题目
+    function printGeneratedProblem(content) {
+        const printWindow = window.open('', '_blank');
+        
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>智能生成题目</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    h1 { font-size: 1.8rem; }
+                    h2 { font-size: 1.5rem; margin-top: 20px; }
+                </style>
+            </head>
+            <body>
+                ${marked.parse(content)}
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
+    }
+    
+    // 使用Markdown渲染题目内容
+    document.addEventListener('DOMContentLoaded', function() {
+        const markdownContainers = document.querySelectorAll('.markdown-preview');
+        markdownContainers.forEach(container => {
+            const content = container.textContent.trim();
+            if (content) {
+                container.innerHTML = marked.parse(content);
+            }
+        });
+    });
+</script>
+{% endblock %} 

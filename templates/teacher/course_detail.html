@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.name }} - 课程详情{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1><i class="bi bi-journal-album me-2"></i>{{ course.name }}</h1>
+        <div>
+            <a href="{{ url_for('teacher_courses') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>返回课程列表
+            </a>
+        </div>
+    </div>
+    <p>{{ course.description or '暂无课程描述' }}</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-mortarboard-fill fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">选课学生</h5>
+                <p class="card-text display-6">{{ students|length }}</p>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#enrollStudentModal">添加学生</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-file-earmark-text fs-1 text-success mb-3"></i>
+                <h5 class="card-title">课程作业</h5>
+                <p class="card-text display-6">{{ assignments|length }}</p>
+                <a href="{{ url_for('teacher_create_assignment') }}" class="btn btn-sm btn-success">添加作业</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-calendar3 fs-1 text-info mb-3"></i>
+                <h5 class="card-title">创建时间</h5>
+                <p class="card-text">{{ course.created_at.strftime('%Y-%m-%d') }}</p>
+                <button class="btn btn-sm btn-info" disabled>课程统计</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <ul class="nav nav-tabs" id="courseDetailTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="assignments-tab" data-bs-toggle="tab" data-bs-target="#assignments" type="button" role="tab" aria-controls="assignments" aria-selected="true">
+                    <i class="bi bi-file-earmark-text me-1"></i>课程作业
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="false">
+                    <i class="bi bi-people me-1"></i>选课学生
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content mt-3" id="courseDetailTabsContent">
+            <div class="tab-pane fade show active" id="assignments" role="tabpanel" aria-labelledby="assignments-tab">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">作业列表</h5>
+                            <a href="{{ url_for('teacher_create_assignment') }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-circle me-1"></i>创建新作业
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if assignments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>作业名称</th>
+                                        <th>创建时间</th>
+                                        <th>截止日期</th>
+                                        <th>题目数量</th>
+                                        <th>已提交数量</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for assignment in assignments %}
+                                    <tr>
+                                        <td>{{ assignment.title }}</td>
+                                        <td>{{ assignment.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ assignment.due_date.strftime('%Y-%m-%d') if assignment.due_date else '无截止日期' }}</td>
+                                        <td>{{ assignment.problems|length }}</td>
+                                        <td>{{ assignment.submissions|length }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{{ url_for('teacher_edit_assignment', assignment_id=assignment.id) }}" class="btn btn-outline-primary" title="编辑作业">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{{ url_for('teacher_view_submissions', assignment_id=assignment.id) }}" class="btn btn-outline-info" title="查看提交">
+                                                    <i class="bi bi-file-earmark-check"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">暂无作业数据</p>
+                            <a href="{{ url_for('teacher_create_assignment') }}" class="btn btn-outline-primary mt-2">
+                                <i class="bi bi-plus-circle me-1"></i>创建第一个作业
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="students" role="tabpanel" aria-labelledby="students-tab">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">学生列表</h5>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#enrollStudentModal">
+                                <i class="bi bi-person-plus me-1"></i>添加学生
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if students %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>学生姓名</th>
+                                        <th>邮箱</th>
+                                        <th>选课时间</th>
+                                        <th>作业完成情况</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                    <tr>
+                                        <td>{{ student.username }}</td>
+                                        <td>{{ student.email }}</td>
+                                        <td>{{ student_enrollments[student.id].enrolled_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            {% set completed = 0 %}
+                                            {% for assignment in assignments %}
+                                                {% for submission in assignment.submissions %}
+                                                    {% if submission.student_id == student.id %}
+                                                        {% set completed = completed + 1 %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                            {{ completed }}/{{ assignments|length }}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button type="button" class="btn btn-outline-info" title="查看作业">
+                                                    <i class="bi bi-file-earmark-text"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger" title="移除学生">
+                                                    <i class="bi bi-person-dash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">暂无学生选修此课程</p>
+                            <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#enrollStudentModal">
+                                <i class="bi bi-person-plus me-1"></i>添加学生
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加学生模态框 -->
+<div class="modal fade" id="enrollStudentModal" tabindex="-1" aria-labelledby="enrollStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="enrollStudentModalLabel">添加学生到课程</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="enrollStudentForm" method="POST" action="{{ url_for('teacher_enroll_student', course_id=course.id) }}">
+                    <div class="mb-3">
+                        <label for="studentSelect" class="form-label">选择学生</label>
+                        <select class="form-select" id="studentSelect" name="student_id" required>
+                            <option value="" selected disabled>请选择学生</option>
+                            {% for student in available_students %}
+                                <option value="{{ student.id }}">{{ student.username }}（{{ student.email }}）</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary">添加</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

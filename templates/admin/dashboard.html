@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}管理员面板 - 智能教学系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-speedometer me-2"></i>管理员面板</h1>
+    <p>系统概览与管理</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-people-fill fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">教师总数</h5>
+                <p class="card-text display-6">{{ teachers|length }}</p>
+                <a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-primary">管理教师</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-mortarboard-fill fs-1 text-success mb-3"></i>
+                <h5 class="card-title">学生总数</h5>
+                <p class="card-text display-6">{{ students|length }}</p>
+                <a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-success">管理学生</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-journal-album fs-1 text-info mb-3"></i>
+                <h5 class="card-title">课程总数</h5>
+                <p class="card-text display-6">{{ courses|length }}</p>
+                <a href="{{ url_for('admin_courses') }}" class="btn btn-sm btn-info">管理课程</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">最近添加的教师</h5>
+            </div>
+            <div class="card-body">
+                {% if teachers %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>邮箱</th>
+                                <th>添加时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for teacher in teachers[:5] %}
+                            <tr>
+                                <td>{{ teacher.username }}</td>
+                                <td>{{ teacher.email }}</td>
+                                <td>{{ teacher.created_at.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">暂无教师数据</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">最近添加的课程</h5>
+            </div>
+            <div class="card-body">
+                {% if courses %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>课程名称</th>
+                                <th>授课教师</th>
+                                <th>添加时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses[:5] %}
+                            <tr>
+                                <td>{{ course.name }}</td>
+                                <td>{{ course.teacher.username }}</td>
+                                <td>{{ course.created_at.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">暂无课程数据</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">系统快捷操作</h5>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-4 mb-3">
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-outline-primary btn-lg w-100">
+                        <i class="bi bi-person-plus-fill me-2"></i>添加新用户
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="{{ url_for('admin_courses') }}" class="btn btn-outline-success btn-lg w-100">
+                        <i class="bi bi-journal-plus me-2"></i>创建新课程
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="#" class="btn btn-outline-secondary btn-lg w-100">
+                        <i class="bi bi-gear-fill me-2"></i>系统设置
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

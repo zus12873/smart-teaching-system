@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}创建作业 - 智能教学系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-file-earmark-plus me-2"></i>创建新作业</h1>
+    <p>为您的课程创建新的作业</p>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">作业信息</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">作业标题</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="course_id" class="form-label">所属课程</label>
+                        <select class="form-select" id="course_id" name="course_id" required>
+                            <option value="" selected disabled>请选择课程</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">作业描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                        <div class="form-text">描述作业的要求、目标和注意事项</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="due_date" class="form-label">截止日期（可选）</label>
+                        <input type="date" class="form-control" id="due_date" name="due_date">
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>创建作业
+                        </button>
+                        <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i>取消
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">作业创建说明</h5>
+            </div>
+            <div class="card-body">
+                <p>创建作业的步骤：</p>
+                <ol>
+                    <li>填写作业的基本信息并选择所属课程</li>
+                    <li>点击"创建作业"按钮提交</li>
+                    <li>系统将引导您添加作业题目</li>
+                    <li>您可以：
+                        <ul>
+                            <li>手动编写题目</li>
+                            <li>使用智能出题系统自动生成题目</li>
+                            <li>上传题库导入题目</li>
+                        </ul>
+                    </li>
+                </ol>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-1"></i>提示：创建作业后，您可以随时编辑作业内容和题目。
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}学生主页 - 智能教学系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-house-door me-2"></i>学生主页</h1>
+    <p>查看您的课程和作业</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-journal-album fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">我的课程</h5>
+                <p class="card-text display-6">{{ courses|length }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-hourglass-split fs-1 text-warning mb-3"></i>
+                <h5 class="card-title">待完成作业</h5>
+                <p class="card-text display-6">{{ pending_assignments|length }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-check2-circle fs-1 text-success mb-3"></i>
+                <h5 class="card-title">已完成作业</h5>
+                <p class="card-text display-6">{{ completed_assignments|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">待完成作业</h5>
+            </div>
+            <div class="card-body">
+                {% if pending_assignments %}
+                <div class="list-group">
+                    {% for item in pending_assignments %}
+                    <a href="{{ url_for('student_view_assignment', assignment_id=item.assignment.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ item.assignment.title }}</h6>
+                            {% if item.assignment.due_date %}
+                            <small class="text-danger">截止日期: {{ item.assignment.due_date.strftime('%Y-%m-%d') }}</small>
+                            {% else %}
+                            <small class="text-muted">无截止日期</small>
+                            {% endif %}
+                        </div>
+                        <p class="mb-1">{{ item.course.name }}</p>
+                        <small class="text-muted">共 {{ item.assignment.problems|length }} 个题目</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">您目前没有待完成的作业</p>
+                    <p>去课程页面查看更多内容吧</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">已完成作业</h5>
+            </div>
+            <div class="card-body">
+                {% if completed_assignments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>作业名称</th>
+                                <th>课程</th>
+                                <th>提交时间</th>
+                                <th>得分</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in completed_assignments %}
+                            <tr>
+                                <td>{{ item.assignment.title }}</td>
+                                <td>{{ item.course.name }}</td>
+                                <td>{{ item.submission.submitted_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    {% if item.submission.is_graded %}
+                                    <span class="
+                                        {% if item.submission.total_score >= 80 %}text-success
+                                        {% elif item.submission.total_score >= 60 %}text-warning
+                                        {% else %}text-danger{% endif %}
+                                        ">{{ item.submission.total_score }}</span>
+                                    {% else %}
+                                    <span class="text-muted">待评分</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('student_view_assignment', assignment_id=item.assignment.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">您还没有完成任何作业</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">我的课程</h5>
+            </div>
+            <div class="card-body">
+                {% if courses %}
+                <div class="list-group">
+                    {% for course in courses %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ course.name }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">教师: {{ course.teacher.username }}</h6>
+                            <p class="card-text small">{{ course.description|truncate(100) or '暂无描述' }}</p>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">共 {{ course.assignments|length }} 个作业</small>
+                                <a href="#" class="card-link">查看课程</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">您还没有选修任何课程</p>
+                    <p>请联系您的教师为您添加课程</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">学习统计</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="chart-container" style="position: relative; height:200px;">
+                        <canvas id="scoreChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>平均分数:</span>
+                    {% set total_score = 0 %}
+                    {% set graded_count = 0 %}
+                    {% for item in completed_assignments %}
+                        {% if item.submission.is_graded %}
+                            {% set total_score = total_score + item.submission.total_score %}
+                            {% set graded_count = graded_count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if graded_count > 0 %}
+                        {% set avg_score = total_score / graded_count %}
+                        <strong class="
+                            {% if avg_score >= 80 %}text-success
+                            {% elif avg_score >= 60 %}text-warning
+                            {% else %}text-danger{% endif %}
+                            ">{{ "%.1f"|format(avg_score) }}</strong>
+                    {% else %}
+                        <strong class="text-muted">-</strong>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>完成率:</span>
+                    {% set total = pending_assignments|length + completed_assignments|length %}
+                    {% if total > 0 %}
+                        {% set completion_rate = (completed_assignments|length / total * 100)|int %}
+                        <strong class="
+                            {% if completion_rate >= 80 %}text-success
+                            {% elif completion_rate >= 50 %}text-warning
+                            {% else %}text-danger{% endif %}
+                            ">{{ completion_rate }}%</strong>
+                    {% else %}
+                        <strong class="text-muted">-</strong>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 简单的统计图表
+        const scores = [
+            {% for item in completed_assignments %}
+                {% if item.submission.is_graded %}
+                    {{ item.submission.total_score }},
+                {% endif %}
+            {% endfor %}
+        ];
+        
+        const labels = [
+            {% for item in completed_assignments %}
+                {% if item.submission.is_graded %}
+                    "{{ item.assignment.title|truncate(10) }}",
+                {% endif %}
+            {% endfor %}
+        ];
+        
+        if (scores.length > 0) {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '作业得分',
+                        data: scores,
+                        backgroundColor: [
+                            'rgba(60, 110, 113, 0.7)',
+                        ],
+                        borderColor: [
+                            'rgba(60, 110, 113, 1)',
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        } else {
+            document.getElementById('scoreChart').style.display = 'none';
+        }
+    });
+</script>
+{% endblock %} 

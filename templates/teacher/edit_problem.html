@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}编辑题目 - 智能教学系统{% endblock %}
+
+{% block styles %}
+.markdown-preview {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin-top: 10px;
+}
+.nav-tabs .nav-link.active {
+    font-weight: bold;
+    color: #3c6e71;
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1><i class="bi bi-file-earmark-text me-2"></i>编辑题目</h1>
+        <div>
+            <a href="{{ url_for('teacher_edit_assignment', assignment_id=problem.assignment_id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>返回作业
+            </a>
+        </div>
+    </div>
+    <p class="text-muted">{{ problem.assignment.course.name }} - {{ problem.assignment.title }} - 第 {{ problem.order }} 题</p>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <ul class="nav nav-tabs card-header-tabs" id="problemTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit" type="button" role="tab" aria-controls="edit" aria-selected="true">
+                            <i class="bi bi-pencil me-1"></i>编辑内容
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview" type="button" role="tab" aria-controls="preview" aria-selected="false">
+                            <i class="bi bi-eye me-1"></i>预览
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="problemTabsContent">
+                    <div class="tab-pane fade show active" id="edit" role="tabpanel" aria-labelledby="edit-tab">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label for="problem_text" class="form-label">题目内容</label>
+                                <textarea class="form-control" id="problem_text" name="problem_text" rows="8" required>{{ problem.problem_text }}</textarea>
+                                <div class="form-text">支持Markdown格式</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="reference_answer" class="form-label">参考答案</label>
+                                <textarea class="form-control" id="reference_answer" name="reference_answer" rows="6">{{ problem.reference_answer or '' }}</textarea>
+                                <div class="form-text">提供标准答案，学生将看不到此内容</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="grading_criteria" class="form-label">评分标准</label>
+                                <textarea class="form-control" id="grading_criteria" name="grading_criteria" rows="4">{{ problem.grading_criteria or '' }}</textarea>
+                                <div class="form-text">
+                                    描述如何评分，AI批改系统将参考这些标准。例如：<br>
+                                    "代码功能实现（50分）、代码风格（30分）、注释完整性（20分）"
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="order" class="form-label">题目顺序</label>
+                                <input type="number" class="form-control" id="order" name="order" value="{{ problem.order }}" min="1">
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('teacher_edit_assignment', assignment_id=problem.assignment_id) }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-circle me-1"></i>取消
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save me-1"></i>保存题目
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="preview" role="tabpanel" aria-labelledby="preview-tab">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">题目内容预览</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="preview-problem-text" class="markdown-preview">
+                                    <!-- 将通过JavaScript填充 -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">参考答案预览</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="preview-reference-answer" class="markdown-preview">
+                                    <!-- 将通过JavaScript填充 -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">评分标准预览</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="preview-grading-criteria" class="markdown-preview">
+                                    <!-- 将通过JavaScript填充 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">智能辅助</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-magic fs-1 text-primary mb-3"></i>
+                                <h5>自动生成参考答案</h5>
+                                <p class="text-muted">使用AI为当前题目生成标准参考答案</p>
+                                <button class="btn btn-outline-primary" id="generateAnswerBtn">生成答案</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-list-check fs-1 text-success mb-3"></i>
+                                <h5>自动生成评分标准</h5>
+                                <p class="text-muted">使用AI为当前题目生成详细评分标准</p>
+                                <button class="btn btn-outline-success" id="generateCriteriaBtn">生成标准</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-lightbulb fs-1 text-warning mb-3"></i>
+                                <h5>智能优化题目</h5>
+                                <p class="text-muted">使用AI优化当前题目的表述和结构</p>
+                                <button class="btn btn-outline-warning" id="optimizeProblemBtn">优化题目</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 使用Markdown渲染预览
+    function updatePreview() {
+        const problemText = document.getElementById('problem_text').value;
+        const referenceAnswer = document.getElementById('reference_answer').value || '暂无参考答案';
+        const gradingCriteria = document.getElementById('grading_criteria').value || '暂无评分标准';
+        
+        document.getElementById('preview-problem-text').innerHTML = marked.parse(problemText);
+        document.getElementById('preview-reference-answer').innerHTML = marked.parse(referenceAnswer);
+        document.getElementById('preview-grading-criteria').innerHTML = marked.parse(gradingCriteria);
+    }
+    
+    // 在文档加载完成后初始化预览
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePreview();
+        
+        // 当切换到预览选项卡时更新预览
+        document.getElementById('preview-tab').addEventListener('shown.bs.tab', updatePreview);
+        
+        // 为智能辅助按钮添加事件监听器
+        document.getElementById('generateAnswerBtn').addEventListener('click', function() {
+            // 这里应当实现调用AI接口生成答案的逻辑
+            alert('此功能正在开发中...');
+            // 生成后可以自动填入参考答案文本框
+            // document.getElementById('reference_answer').value = '生成的参考答案';
+        });
+        
+        document.getElementById('generateCriteriaBtn').addEventListener('click', function() {
+            // 这里应当实现调用AI接口生成评分标准的逻辑
+            alert('此功能正在开发中...');
+        });
+        
+        document.getElementById('optimizeProblemBtn').addEventListener('click', function() {
+            // 这里应当实现调用AI接口优化题目的逻辑
+            alert('此功能正在开发中...');
+        });
+    });
+</script>
+{% endblock %} 

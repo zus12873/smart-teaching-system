@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}课程管理 - 智能教学系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-journal-album me-2"></i>课程管理</h1>
+    <p>创建和管理系统课程</p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">创建新课程</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">课程名称</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">课程描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="teacher_id" class="form-label">授课教师</label>
+                        <select class="form-select" id="teacher_id" name="teacher_id" required>
+                            <option value="" selected disabled>选择教师</option>
+                            {% for teacher in teachers %}
+                            <option value="{{ teacher.id }}">{{ teacher.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">创建课程</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">课程列表</h5>
+                    <div class="input-group" style="width: 250px;">
+                        <input type="text" class="form-control" placeholder="搜索课程..." id="courseSearch">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if courses %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>课程名称</th>
+                                <th>授课教师</th>
+                                <th>创建时间</th>
+                                <th>学生数量</th>
+                                <th>作业数量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                            <tr>
+                                <td>{{ course.name }}</td>
+                                <td>{{ course.teacher.username }}</td>
+                                <td>{{ course.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ course.enrollments|length }}</td>
+                                <td>{{ course.assignments|length }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ url_for('admin_edit_course', course_id=course.id) }}" class="btn btn-outline-primary" title="编辑">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="POST" action="{{ url_for('admin_delete_course', course_id=course.id) }}" style="display:inline;" onsubmit="return confirm('确定要删除该课程吗？');">
+                                            <button type="submit" class="btn btn-outline-danger" title="删除">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">暂无课程数据</p>
+                    <button class="btn btn-outline-primary mt-2">
+                        <i class="bi bi-plus-circle me-1"></i>创建第一个课程
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 课程详情模态框 -->
+<div class="modal fade" id="courseDetailModal" tabindex="-1" aria-labelledby="courseDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="courseDetailModalLabel">课程详情</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>基本信息</h6>
+                        <dl class="row">
+                            <dt class="col-sm-4">课程名称:</dt>
+                            <dd class="col-sm-8" id="modal-course-name"></dd>
+                            
+                            <dt class="col-sm-4">授课教师:</dt>
+                            <dd class="col-sm-8" id="modal-course-teacher"></dd>
+                            
+                            <dt class="col-sm-4">创建时间:</dt>
+                            <dd class="col-sm-8" id="modal-course-created"></dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>课程描述</h6>
+                        <p id="modal-course-description"></p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <ul class="nav nav-tabs" id="courseDetailTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students-tab-pane" type="button" role="tab">学生列表</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="assignments-tab" data-bs-toggle="tab" data-bs-target="#assignments-tab-pane" type="button" role="tab">作业列表</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content p-3 border border-top-0 rounded-bottom" id="courseDetailTabsContent">
+                            <div class="tab-pane fade show active" id="students-tab-pane" role="tabpanel" aria-labelledby="students-tab" tabindex="0">
+                                <div id="modal-course-students">
+                                    <!-- 学生列表将通过JavaScript填充 -->
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="assignments-tab-pane" role="tabpanel" aria-labelledby="assignments-tab" tabindex="0">
+                                <div id="modal-course-assignments">
+                                    <!-- 作业列表将通过JavaScript填充 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary">编辑课程</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 搜索功能
+    document.getElementById('courseSearch').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        tableRows.forEach(row => {
+            const courseName = row.cells[0].textContent.toLowerCase();
+            const teacherName = row.cells[1].textContent.toLowerCase();
+            
+            if (courseName.includes(searchValue) || teacherName.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // 课程详情查看功能（需要通过AJAX加载实际数据）
+    document.querySelectorAll('.btn-outline-info').forEach(button => {
+        button.addEventListener('click', function() {
+            // 这里应该发送AJAX请求获取课程详情
+            // 暂时使用模拟数据
+            document.getElementById('modal-course-name').textContent = this.closest('tr').cells[0].textContent;
+            document.getElementById('modal-course-teacher').textContent = this.closest('tr').cells[1].textContent;
+            document.getElementById('modal-course-created').textContent = this.closest('tr').cells[2].textContent;
+            document.getElementById('modal-course-description').textContent = '这是课程的详细描述...';
+            
+            // 显示模态框
+            new bootstrap.Modal(document.getElementById('courseDetailModal')).show();
+        });
+    });
+</script>
+{% endblock %} 
