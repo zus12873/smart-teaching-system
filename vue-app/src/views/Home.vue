@@ -141,23 +141,23 @@ export default {
 .page-header {
   text-align: center;
   margin-bottom: 30px;
-  border-bottom: 2px solid #3c6e71;
+  border-bottom: 2px solid #1976d2;
   padding-bottom: 20px;
 }
 
 .page-header h1 {
-  color: #2c3e50;
+  color: #1565c0;
   font-weight: 600;
 }
 
 .page-header p {
-  color: #7f8c8d;
+  color: #424242;
   font-size: 16px;
 }
 
 .feature-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(33, 150, 243, 0.15);
 }
 
 .accordion-button {
@@ -165,7 +165,7 @@ export default {
 }
 
 .accordion-button:not(.collapsed) {
-  background-color: #e7f3ff;
-  color: #0c63e4;
+  background-color: #e3f2fd;
+  color: #1976d2;
 }
 </style> 

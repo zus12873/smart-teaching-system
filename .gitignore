@@ -268,7 +268,12 @@ models/
 data/
 datasets/
 *.csv
-*.json
+# *.json  # 注释掉，避免忽略重要的配置文件如 package.json
+# 具体的数据 JSON 文件可以通过以下规则忽略：
+data/**/*.json
+datasets/**/*.json
+**/data/*.json
+**/datasets/*.json
 *.xml
 *.yaml
 *.yml

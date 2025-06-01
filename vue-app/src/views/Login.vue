@@ -252,14 +252,14 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); /* 浅蓝色渐变 */
   padding: 20px;
 }
 
 .login-card {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(33, 150, 243, 0.15); /* 蓝色阴影 */
   padding: 40px;
   width: 100%;
   max-width: 400px;
@@ -284,12 +284,12 @@ export default {
 
 .logo {
   font-size: 3rem;
-  color: #667eea;
+  color: #1976d2; /* 调整为蓝色 */
   margin-bottom: 15px;
 }
 
 .login-header h2 {
-  color: #2c3e50;
+  color: #1565c0; /* 调整为深蓝色 */
   font-weight: 600;
   margin-bottom: 8px;
 }
@@ -309,12 +309,12 @@ export default {
 }
 
 .form-control:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  border-color: #1976d2; /* 蓝色聚焦边框 */
+  box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25); /* 蓝色聚焦阴影 */
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); /* 蓝色渐变按钮 */
   border: none;
   border-radius: 8px;
   padding: 12px 24px;
@@ -324,7 +324,7 @@ export default {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3); /* 蓝色悬停阴影 */
 }
 
 .btn-primary:disabled {
@@ -362,7 +362,7 @@ export default {
 }
 
 .system-info p {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(25, 118, 210, 0.8); /* 调整为蓝色透明文字 */
   margin: 0;
 }
 
@@ -382,7 +382,7 @@ export default {
 }
 
 .input-group .form-control:focus + .btn {
-  border-color: #667eea;
+  border-color: #1976d2; /* 蓝色边框 */
 }
 
 @media (max-width: 480px) {

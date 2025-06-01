@@ -10,6 +10,7 @@ decorator==5.2.1
 dotenv==0.9.9
 executing==2.2.0
 Flask==3.1.0
+flask-cors==6.0.0
 Flask-Login==0.6.3
 Flask-SQLAlchemy==3.1.1
 greenlet==3.2.1

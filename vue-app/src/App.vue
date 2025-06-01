@@ -51,13 +51,14 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background-color: #f8f9fa;
+  background-color: #e3f2fd; /* 浅蓝色背景 */
   color: #333;
 }
 #app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #e3f2fd; /* 浅蓝色背景 */
 }
 
 /* 固定在顶部的导航栏 */
@@ -68,7 +69,7 @@ body {
   width: 100%;
   z-index: 1000;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15); /* 调整阴影颜色 */
 }
 
 /* 主容器样式：上下都留空间 */
@@ -77,7 +78,7 @@ body {
   max-width: 1200px;
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 20px rgba(33, 150, 243, 0.15); /* 调整阴影颜色 */
   padding: 30px;
   flex: 1;
 }
@@ -96,43 +97,43 @@ body {
 .page-header {
   text-align: center;
   margin-bottom: 30px;
-  border-bottom: 2px solid #3c6e71;
+  border-bottom: 2px solid #1976d2; /* 调整为蓝色 */
   padding-bottom: 20px;
 }
 .page-header h1 {
-  color: #2c3e50;
+  color: #1565c0; /* 调整为深蓝色 */
   font-weight: 600;
 }
 .page-header p {
-  color: #7f8c8d;
+  color: #424242; /* 调整文字颜色 */
   font-size: 16px;
 }
 
 /* 按钮样式 */
 .btn-primary {
-  background-color: #3c6e71;
-  border-color: #3c6e71;
+  background-color: #1976d2; /* 蓝色按钮 */
+  border-color: #1976d2;
 }
 .btn-primary:hover {
-  background-color: #335c5f;
-  border-color: #335c5f;
+  background-color: #1565c0; /* 深蓝色悬停 */
+  border-color: #1565c0;
 }
 
 /* 卡片样式 */
 .card {
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.1); /* 蓝色阴影 */
   margin-bottom: 20px;
   transition: all 0.3s;
 }
 .feature-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 25px rgba(33, 150, 243, 0.2); /* 加强蓝色阴影 */
 }
 .card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
   font-weight: 600;
 }
 
@@ -143,8 +144,8 @@ body {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 .form-control:focus {
-  border-color: #3c6e71;
-  box-shadow: 0 0 0 0.2rem rgba(60, 110, 113, 0.25);
+  border-color: #1976d2; /* 蓝色聚焦边框 */
+  box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25); /* 蓝色聚焦阴影 */
 }
 
 /* 表格样式 */
@@ -153,7 +154,7 @@ body {
   overflow: hidden;
 }
 .table thead th {
-  background-color: #3c6e71;
+  background-color: #1976d2; /* 蓝色表头 */
   color: white;
   border: none;
   font-weight: 600;
@@ -249,17 +250,17 @@ body {
   justify-content: center;
 }
 .page-link {
-  color: #3c6e71;
+  color: #1976d2; /* 蓝色分页链接 */
   border-color: #dee2e6;
 }
 .page-link:hover {
-  color: #335c5f;
-  background-color: #e9ecef;
+  color: #1565c0; /* 深蓝色悬停 */
+  background-color: #e3f2fd; /* 浅蓝色背景 */
   border-color: #dee2e6;
 }
 .page-item.active .page-link {
-  background-color: #3c6e71;
-  border-color: #3c6e71;
+  background-color: #1976d2; /* 蓝色激活状态 */
+  border-color: #1976d2;
 }
 
 /* 固定在底部的页脚 */
@@ -269,7 +270,7 @@ body {
   left: 0;
   width: 100%;
   background: #fff;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -2px 8px rgba(33, 150, 243, 0.15); /* 蓝色阴影 */
   z-index: 1000;
 }
 </style>
