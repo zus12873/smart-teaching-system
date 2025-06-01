@@ -90,7 +90,7 @@ def run_dify_workflow(api_key, workflow_inputs, file_id=None, response_mode="blo
         dict: 工作流执行结果，如果失败则返回None
     """
     # API端点
-    url = "https://api.dify.ai/v1/workflows/run"
+    url = f"{base_url}/v1/workflows/run"
     
     # 设置请求头
     headers = {
