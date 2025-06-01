@@ -11,6 +11,7 @@ ENV/
 .venv/
 .env/
 venv.bak/
+.DS_Store
 
 # Python 字节码文件
 __pycache__/
