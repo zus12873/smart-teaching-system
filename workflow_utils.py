@@ -1,6 +1,9 @@
 import requests
 import json
 import os
+import dotenv
+dotenv.load_dotenv()
+base_url = os.getenv('DIFY_BASE_URL')
 
 def upload_file_to_dify(api_key, file_path, file_type=None, user_id="abc-123"):
     """
@@ -16,7 +19,7 @@ def upload_file_to_dify(api_key, file_path, file_type=None, user_id="abc-123"):
         dict: API响应结果，如果失败则返回None
     """
     # API端点
-    url = "https://api.dify.ai/v1/files/upload"
+    url = f"{base_url}/v1/files/upload"
     
     # 设置请求头
     headers = {
