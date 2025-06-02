@@ -199,6 +199,12 @@ export default {
     }
 
     const createAssignment = async () => {
+      // 防重复提交检查
+      if (isSubmitting.value) {
+        console.log('正在创建作业中，请勿重复提交')
+        return
+      }
+      
       if (!formData.value.title.trim()) {
         alert('请输入作业标题')
         return

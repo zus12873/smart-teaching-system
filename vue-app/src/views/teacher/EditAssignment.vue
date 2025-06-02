@@ -215,7 +215,7 @@
             ></button>
           </div>
           <div class="modal-body">
-            <form id="addProblemForm" @submit.prevent="addProblem">
+            <form id="addProblemForm">
               <div class="mb-3">
                 <label for="problem_text" class="form-label">题目内容</label>
                 <textarea 
@@ -225,6 +225,7 @@
                   rows="5" 
                   required
                   placeholder="请输入题目内容，支持Markdown格式"
+                  @keydown.enter="handleTextareaEnter"
                 ></textarea>
                 <div class="form-text">支持Markdown格式</div>
               </div>
@@ -237,6 +238,7 @@
                   v-model="problemForm.reference_answer"
                   rows="3"
                   placeholder="输入参考答案（可选）"
+                  @keydown.enter="handleTextareaEnter"
                 ></textarea>
               </div>
               
@@ -248,6 +250,7 @@
                   v-model="problemForm.grading_criteria"
                   rows="3"
                   placeholder="描述如何评分，AI批改系统将参考这些标准"
+                  @keydown.enter="handleTextareaEnter"
                 ></textarea>
                 <div class="form-text">描述如何评分，AI批改系统将参考这些标准</div>
               </div>
@@ -584,6 +587,12 @@ export default {
     }
 
     const addProblem = async () => {
+      // 防重复提交检查
+      if (isAddingProblem.value) {
+        console.log('正在添加题目中，请勿重复提交')
+        return
+      }
+      
       if (!problemForm.problem_text.trim()) {
         alert('请输入题目内容')
         return
@@ -663,6 +672,12 @@ export default {
     }
 
     const generateProblem = async () => {
+      // 防重复提交检查
+      if (isGenerating.value) {
+        console.log('正在生成题目中，请勿重复提交')
+        return
+      }
+      
       // 验证题目数量
       const total = parseInt(generateForm.choice) + parseInt(generateForm.true_false) + 
                    parseInt(generateForm.gap_filling) + parseInt(generateForm.programming)
@@ -711,6 +726,12 @@ export default {
     }
 
     const saveGeneratedProblem = async () => {
+      // 防重复提交检查
+      if (isSavingGenerated.value) {
+        console.log('正在保存题目中，请勿重复提交')
+        return
+      }
+      
       if (!generatedProblemText.value.trim()) {
         alert('没有可保存的题目')
         return
@@ -803,6 +824,11 @@ export default {
       }
     }
 
+    const handleTextareaEnter = (event) => {
+      // 阻止默认行为
+      event.preventDefault()
+    }
+
     onMounted(() => {
       loadAssignment()
     })
@@ -836,7 +862,8 @@ export default {
       printGeneratedProblem,
       closeGenerateModal,
       handleFileChange,
-      clearFile
+      clearFile,
+      handleTextareaEnter
     }
   }
 }

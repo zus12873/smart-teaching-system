@@ -1043,23 +1043,13 @@ def api_teacher_generate_problem():
             if not problem_text:
                 return jsonify({"success": False, "message": "题目生成失败（无有效输出）"}), 500
 
-            # 创建新问题
-            order = Problem.query.filter_by(assignment_id=assignment_id).count() + 1
-            problem = Problem(
-                assignment_id=assignment_id,
-                problem_text=problem_text,
-                order=order
-            )
-            db.session.add(problem)
-            db.session.commit()
-
+            # 只返回生成的题目文本，不保存到数据库
+            # 前端将负责调用单独的保存接口来保存题目
             return jsonify({
                 "success": True,
                 "message": "题目生成成功",
                 "problem": {
-                    "id": problem.id,
-                    "problem_text": problem_text,
-                    "order": order
+                    "problem_text": problem_text
                 }
             })
         else:

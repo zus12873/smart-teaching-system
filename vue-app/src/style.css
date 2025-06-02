@@ -71,7 +71,7 @@ button:focus-visible {
   padding: 2rem;
   text-align: center;
   background-color: transparent;
-}
+  }
 
 html, body {
   background-color: #e3f2fd !important;
