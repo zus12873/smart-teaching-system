@@ -17,15 +17,15 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="subject" class="form-label">学科领域</label>
-                    <select class="form-select" id="subject" v-model="formData.subject" required>
-                      <option value="计算机">计算机</option>
-                      <option value="数学">数学</option>
-                      <option value="物理">物理</option>
-                      <option value="化学">化学</option>
-                      <option value="生物">生物</option>
-                      <option value="语文">语文</option>
-                      <option value="英语">英语</option>
-                    </select>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="subject"
+                      v-model="formData.subject"
+                      placeholder="请输入学科领域，如：计算机、数学、物理等"
+                      required
+                    />
+                    <div class="form-text">输入您要生成题目的学科领域</div>
                   </div>
                   
                   <div class="mb-3">
